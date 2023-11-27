@@ -7,12 +7,12 @@ const router = express.Router();
 
 //auth routes
 // /api/signup
-router.post("/signup", signup);
+router.post("/register", signup);
 // /api/signin
-router.post("/signin", signin);
+router.post("/login", signin);
 // /api/logout
 router.get("/logout", logout);
 // // /api/me
-router.get("/me", isAuthenticated, userProfile);
+router.get("/userprofile", isAuthenticated, userProfile);
 
 export default router;
