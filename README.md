@@ -1,5 +1,6 @@
 # Introduction
-Project BackEnd POS-Coffee-Shop
+
+Project BackEnd Job-Web
 
 Build on Express JS
 
@@ -14,23 +15,43 @@ Deploy on [Vercel](https://vercel.com/)
 URL : https://point-of-sale-be.vercel.app/
 
 # Routes
-## Index [" / "] : just render text "Point of Sale - API"
-## Router for account
-  + [GET]   - /acc : Get all account from database
-  + [GET]   - /acc/:id : Find account by id
-  + [DEL]   - /acc/:id : Delete account by id
-  + [POST]  - /acc/login : login by account
-  + [POST]  - /acc/register : create new account
-  + [PUT]   - /acc/update/:id : Update account by id
-  + [PUT]   - /acc/changepw/:id : Update password by id
-## Router for dish
-  + [GET]   - /dish : Get all dish from database
-  + [GET]   - /dish/:id : Find dish by id
-  + [DEL]   - /dish/:id : Delete dish by id
-  + [POST]  - /dish : Create new dish
-  + [PUT]   - /dish/:id : Update dish by id
-## Router for history
-  + [GET]   - /history : Get all order from database
-  + [POST]   - /history/order : Create new order
-  + [DEL]  - /history/order/:id : Delete order by id
+
+## Index [" / "] : just render text "Job Web - API"
+
+## Router for auth
+
+- [GET] - /me : Get profile from database
+- [GET] - /logout : logout
+- [POST] - /signup : create new account
+- [POST] - /signin : login by account
+
+## Router for category
+
+- [GET] - /categories : Get all category from database
+- [DEL] - /category/delete/:category_id : Delete category by id
+- [POST] - /category/create : Create new category
+- [PUT] - /category/update/:category_id : Update category by id
+
+## Router for company
+
+- [GET] - /companies : Get all company from database
+- [DEL] - /company/delete/:company_id : Delete company by id
+- [POST] - /company/create : Create new company
+- [PUT] - /company/update/:company_id : Update company by id
+
+## Router for user
+
+- [GET] - /allusers : Get all user from database
+- [GET] - /user/:id : Find user by id
+- [DEL] - /user/delete/:id : Delete user by id
+- [POST] - /user/jobhistory : Create new jobhistory of user
+- [PUT] - /user/update/:id : Update user by id
+
+## Router for job
+
+- [GET] - /jobs : Get all job from database
+- [GET] - /job/:id : Find job by id
+- [DEL] - /job/:id : Delete job by id
+- [POST] - /job/create : Create new job
+- [PUT] - /job/update/:job_id : Update job by id
 
