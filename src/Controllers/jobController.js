@@ -6,18 +6,7 @@ const JobController = {
   //create job
   createJob: async (req, res, next) => {
     try {
-      const job = await Job.create({
-        title: req.body.title,
-        description: req.body.description,
-        salaryRange: req.body.salaryRange,
-        location: req.body.location,
-        jobType: req.body.jobType,
-        status: req.body.status,
-        category: req.body.category,
-        company: req.body.company,
-        specialTags: req.body.specialTags,
-        user: req.user.id,
-      });
+      const job = await Job.create(req.body);
       res.status(201).json({
         success: true,
         job,
@@ -115,6 +104,42 @@ const JobController = {
         pages: Math.ceil(count / pageSize),
         count,
         setUniqueLocation,
+      });
+    } catch (error) {
+      next(error);
+    }
+  },
+  getJobs: async (req, res, next) => {
+    try {
+      async function getJobsService() {
+        try {
+          // const jobs = await JobModel.find(arg).lean(true)
+          const jobs = await Job.find({
+            "status.isApproved": true,
+            "status.isPublished": true,
+            "status.isFeatured": true,
+            "status.isActive": true,
+          })
+            .populate("company", [
+              "companyName",
+              "companyTagline",
+              "logo",
+              "companyEmail",
+              "phoneNumber",
+              "companyWebsite",
+              "socialLink",
+            ])
+            .lean(true);
+          return jobs;
+        } catch (e) {
+          throw e;
+        }
+      }
+
+      const jobs = await getJobsService();
+      res.status(200).json({
+        success: true,
+        jobs,
       });
     } catch (error) {
       next(error);

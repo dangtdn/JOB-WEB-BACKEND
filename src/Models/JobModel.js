@@ -2,43 +2,92 @@ import mongoose from "mongoose";
 
 const JobSchema = mongoose.Schema(
   {
-    title: { type: String, required: [true, "Title can not empty!!!"] },
-    description: {
-      type: String,
-      trim: true,
-      required: [true, "Description is required"],
+    user: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
     },
-    location: { type: String, default: "", required: false },
-    salaryRange: {
-      maximum: { type: Number, required: [true, "Salary is required"] },
-      minimum: { type: Number, required: [true, "Salary is required"] },
-    },
-    jobType: {
-      type: String,
-      enum: ["Full Time", "Part Time", "Remote"],
-      default: "Full Time",
+    company: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Company",
     },
     status: {
-      isActive: { type: Boolean, default: true },
-      isApproved: { type: Boolean, default: true },
+      isApproved: {
+        type: Boolean,
+        default: false,
+      },
+      isPublished: {
+        type: Boolean,
+        default: true,
+      },
+      isFeatured: {
+        type: Boolean,
+        default: false,
+      },
+      isActive: {
+        type: Boolean,
+        default: true,
+      },
     },
-    specialTags: { type: [String], default: [] },
+    jobTitle: {
+      type: String,
+      required: true,
+    },
+    location: {
+      type: String,
+    },
+    region: {
+      type: String,
+    },
+    jobTypes: [
+      {
+        type: String,
+      },
+    ],
     category: {
-      type: mongoose.Types.ObjectId,
-      ref: "Category",
-      required: true,
+      type: String,
     },
-    user: {
-      type: mongoose.Types.ObjectId,
-      ref: "User",
-      required: true,
+    specialTags: [
+      {
+        type: String,
+      },
+    ],
+    jobDescription: {
+      type: String,
     },
-    // company: {
-    //   type: mongoose.Types.ObjectId,
-    //   ref: "Company",
-    //   require: true,
-    // },
-    // relatedJobs: [JobSchema],
+    email: String,
+    jobExperience: String,
+
+    applyDeadline: {
+      type: String,
+    },
+    hourlyrate: {
+      minimum: {
+        type: Number,
+      },
+      maximum: {
+        type: Number,
+      },
+    },
+    salary: {
+      minimum: {
+        type: Number,
+      },
+      maximum: {
+        type: Number,
+      },
+    },
+    applyLink: {
+      type: String,
+    },
+    avatar: {
+      type: String,
+    },
+    avatarCloudinary_id: {
+      type: String,
+    },
+    expireAt: {
+      type: Date,
+    },
   },
   { timestamps: true }
 );

@@ -12,7 +12,7 @@ router.post("/signup", signup);
 router.post("/signin", signin);
 // /api/logout
 router.get("/logout", logout);
-// // /api/me
-router.get("/me", isAuthenticated, userProfile);
+// // /api/user-profile
+router.get("/user-profile", isAuthenticated, userProfile);
 
 export default router;

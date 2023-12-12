@@ -2,38 +2,56 @@ import mongoose from "mongoose";
 
 const CompanySchema = mongoose.Schema(
   {
-    companyName: { type: String, required: [true, "Name can not empty!!!"] },
-    companyEmail: {
-      type: String,
-      required: [true, "Name can not empty!!!"],
-      unique: true,
-      lowercase: true,
-      trim: true,
-    },
-    companySize: { type: String, default: "" },
-    companyWebsite: { type: String, default: "" },
-    description: { type: String, default: "" },
-    logo: {
-      url: {
-        type: String,
-        required: [true, "Logo can not empty!!!"],
-      },
-    },
-    phoneNumber: { type: String, maxlength: 10 },
-    location: { type: String, default: "" },
-    locationMap: {
-      latitude: { type: String, default: "" },
-      longitude: { type: String, default: "" },
-    },
-    socialLink: {
-      linkedin: { type: String, default: "" },
-      facebook: { type: String, default: "" },
+    user: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
     },
     status: {
-      isActive: { type: Boolean, default: true },
-      isApproved: { type: Boolean, default: true },
+      isPublished: {
+        type: Boolean,
+        default: true,
+      },
+      isApproved: {
+        type: Boolean,
+        default: false,
+      },
+      isActive: {
+        type: Boolean,
+        default: true,
+      },
     },
-    userId: { type: String, unique: true },
+    companyName: {
+      type: String,
+      required: true,
+    },
+    companyTagline: String,
+    category: String,
+    videoLink: String,
+    companyEmail: String,
+    phoneNumber: String,
+    eatablishedDate: String,
+    companyWebsite: String,
+    avarageSalary: String,
+    revenue: String,
+    socialLink: {
+      linkedin: String,
+      facebook: String,
+      twitter: String,
+    },
+    companySize: String,
+    description: {
+      type: String,
+      required: true,
+    },
+    location: String,
+    locationMap: {
+      latitude: String,
+      longitude: String,
+    },
+    logo: String,
+    logoCloudinary_id: String,
+    thumb: String,
+    thumbCloudinary_id: String,
   },
   { timestamps: true }
 );

@@ -42,58 +42,56 @@ const jobsHistorySchema = new mongoose.Schema(
 
 const userSchema = new mongoose.Schema(
   {
-    account: {
+    fullName: {
+      firstName: {
+        type: String,
+      },
+      lastName: {
+        type: String,
+      },
+    },
+    email: {
       type: String,
-      required: [true, "Account can not empty!!!"],
-      index: { unique: true },
+      required: [true, "Email can not empty!!!"],
+      index: true,
+      unique: true,
+      sparse: true,
     },
     password: {
       type: String,
       required: [true, "Password can not empty!!!"],
     },
-    firstName: {
-      type: String,
-      required: [true, "First Name can not empty!!!"],
+    isConfirmed: {
+      type: Boolean,
     },
-    lastName: {
+    resetLink: {
+      data: String,
+      default: "",
+    },
+    avatar: {
       type: String,
-      required: [true, "Last Name can not empty!!!"],
+    },
+    cloudinary_id: {
+      type: String,
     },
     role: {
-      type: String,
-      required: [true, "Role can not empty!!!"],
-    },
-    image: {
-      url: {
-        type: String,
-        required: [true, "Image can not empty!!!"],
+      isCandidate: {
+        type: Boolean,
       },
-    },
-    gender: {
-      type: String,
-      enum: {
-        values: ["male", "female"],
-        message: "Gender must be a male or female!!!",
+      isEmployer: {
+        type: Boolean,
       },
-      required: [true, "Gender can not empty!!!"],
+      isAdmin: {
+        type: Boolean,
+      },
     },
     phoneNumber: {
       type: String,
-      required: [true, "Phone number can not empty!!!"],
-      minLength: 10,
-      maxLength: 10,
+      default: "",
     },
-    birthday: {
+    aboutMe: {
       type: String,
-      required: [true, "Birth day can not empty!!!"],
-    },
-    location: {
-      type: String,
-      required: [true, "Location can not empty!!!"],
-    },
-    active: {
-      type: Boolean,
-      default: true,
+      default: "",
     },
     jobsHistory: [jobsHistorySchema],
   },

@@ -9,14 +9,19 @@ const router = express.Router();
 //job type routes
 
 // /api/type/create
-router.post("/type/create", isAuthenticated, isAdmin, createCategory);
-// /api/type/jobs
-router.get("/type/jobs", allCategories);
-// /api/type/update/type_id
-router.put("/type/update/:type_id", isAuthenticated, isAdmin, updateCategory);
-// /api/type/delete/type_id
+router.post("/admin/category/create", isAuthenticated, isAdmin, createCategory);
+// /api/category/jobs
+router.get("/categories", allCategories);
+// /api/category/update/category_id
+router.put(
+  "/admin/category/update/:id",
+  isAuthenticated,
+  isAdmin,
+  updateCategory
+);
+// /api/category/delete/category_id
 router.delete(
-  "/type/delete/:type_id",
+  "/admin/category/delete/:id",
   isAuthenticated,
   isAdmin,
   deleteCategory
