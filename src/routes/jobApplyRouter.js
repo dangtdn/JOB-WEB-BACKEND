@@ -14,9 +14,9 @@ const router = express.Router();
 // /api/job-apply/create
 router.post("/job-apply/create", isAuthenticated, createJobApply);
 // /api/users/:id/job-apply
-router.get("/users/:id/job-apply", getUserApplication);
+router.get("/users/:id/job-apply", isAuthenticated, getUserApplication);
 // /api/jobs/:id/job-apply
-router.get("/jobs/:id/job-apply", getJobApplication);
+router.get("/jobs/:id/job-apply", isAuthenticated, getJobApplication);
 // /api/job-apply/:id/update
 router.put(
   "/job-apply/:id/update",

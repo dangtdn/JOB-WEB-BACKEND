@@ -1,5 +1,5 @@
 import JobApply from "../Models/JobApplyModel.js";
-import { getJobApplicationsService } from "../services/jobApplyService";
+import { getJobApplicationsService } from "../services/jobApplyService.js";
 
 const JobApplyController = {
   // create JobApply
