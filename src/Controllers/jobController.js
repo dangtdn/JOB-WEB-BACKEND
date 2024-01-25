@@ -1,12 +1,27 @@
 import { Job } from "../Models/JobModel.js";
 import { Category } from "../Models/CategoryModel.js";
 import ErrorResponse from "../utils/errorResponse.js";
+import Cloud from "../utils/cloudinary.js";
 
 const JobController = {
   //create job
   createJob: async (req, res, next) => {
     try {
-      const job = await Job.create(req.body);
+      let jobInput;
+      if (req.body.headerImage) {
+        // Upload image to cloudinary
+        const headerImageData = await Cloud.uploader.upload(headerImage);
+        jobInput = {
+          ...req.body.job,
+          avatar: headerImageData.secure_url,
+          avatarCloudinary_id: headerImageData.public_id,
+        };
+      } else {
+        jobInput = {
+          ...req.body.job,
+        };
+      }
+      const job = await Job.create(jobInput);
       res.status(201).json({
         success: true,
         job,
