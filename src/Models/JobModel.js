@@ -34,9 +34,11 @@ const JobSchema = mongoose.Schema(
     },
     location: {
       type: String,
+      default: "",
     },
     region: {
       type: String,
+      default: "",
     },
     jobTypes: [
       {
@@ -53,40 +55,48 @@ const JobSchema = mongoose.Schema(
     ],
     jobDescription: {
       type: String,
+      default: "",
     },
-    email: String,
-    jobExperience: String,
-
+    email: { type: String },
+    jobExperience: { type: String },
     applyDeadline: {
       type: String,
     },
     hourlyrate: {
       minimum: {
         type: Number,
+        default: 0,
       },
       maximum: {
         type: Number,
+        default: 0,
       },
     },
     salary: {
       minimum: {
         type: Number,
+        default: 0,
       },
       maximum: {
         type: Number,
+        default: 0,
       },
     },
     applyLink: {
       type: String,
+      default: "",
     },
     avatar: {
       type: String,
+      default: "",
     },
     avatarCloudinary_id: {
       type: String,
+      default: "",
     },
     expireAt: {
       type: Date,
+      default: "",
     },
   },
   { timestamps: true }
