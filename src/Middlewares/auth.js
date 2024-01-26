@@ -4,7 +4,13 @@ import ErrorResponse from "../utils/errorResponse.js";
 
 // check is user is authenticated
 export const isAuthenticated = async (req, res, next) => {
-  const { token } = req.cookies;
+  // const { token } = req.cookies;
+  const { headers } = req;
+  console.log("headers", headers);
+  const token = headers.authorization?.substring(
+    7,
+    headers.authorization.length
+  );
   // Make sure token exists
   if (!token) {
     return next(new ErrorResponse("Not authorized to access this route", 401));
@@ -22,8 +28,9 @@ export const isAuthenticated = async (req, res, next) => {
 
 //middleware for admin
 export const isAdmin = (req, res, next) => {
+  console.log("req.user: ", req.user);
   if (req.user.role === 0) {
-    return next(new ErrorResponse("Access denied, you must an admin", 401));
+    return next(new ErrorResponse("Access denied, you must an admin", 403));
   }
   next();
 };

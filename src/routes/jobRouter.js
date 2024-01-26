@@ -7,7 +7,7 @@ const router = express.Router();
 //jobs routes
 
 // /api/job/create
-router.post("/admin/job/create", isAuthenticated, isAdmin, createJob);
+router.post("/admin/job/create", isAuthenticated, createJob);
 // /api/job/id
 router.get("/job/:id", singleJob);
 // /api/job/update/job_id
