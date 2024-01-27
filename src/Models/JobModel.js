@@ -1,5 +1,16 @@
 import mongoose from "mongoose";
 
+const imageSchema = new mongoose.Schema({
+  name: { type: String },
+  data: { type: Buffer },
+  size: { type: Number },
+  encoding: { type: String },
+  tempFilePath: { type: String },
+  truncated: { type: Boolean },
+  mimetype: { type: String },
+  md5: { type: String },
+});
+
 const JobSchema = mongoose.Schema(
   {
     user: {
@@ -88,8 +99,11 @@ const JobSchema = mongoose.Schema(
       type: String,
       default: "",
     },
+    // avatarFile: {
+    //   type: imageSchema,
+    // },
     avatar: {
-      type: String,
+      type: String | undefined,
       default: "",
     },
     avatarCloudinary_id: {
