@@ -129,12 +129,7 @@ const JobController = {
       async function getJobsService() {
         try {
           // const jobs = await JobModel.find(arg).lean(true)
-          const jobs = await Job.find({
-            "status.isApproved": true,
-            "status.isPublished": true,
-            "status.isFeatured": true,
-            "status.isActive": true,
-          })
+          const jobs = await Job.find()
             .populate("company", [
               "companyName",
               "companyTagline",

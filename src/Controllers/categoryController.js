@@ -21,10 +21,10 @@ const categoryController = {
   //all jobs category
   allCategories: async (req, res, next) => {
     try {
-      const job = await Category.find();
+      const category = await Category.find();
       res.status(200).json({
         success: true,
-        job,
+        category,
       });
     } catch (error) {
       next(error);
@@ -34,7 +34,7 @@ const categoryController = {
   //update job category
   updateCategory: async (req, res, next) => {
     try {
-      const job = await Category.findByIdAndUpdate(
+      const category = await Category.findByIdAndUpdate(
         req.params.type_id,
         req.body,
         {
@@ -43,7 +43,7 @@ const categoryController = {
       );
       res.status(200).json({
         success: true,
-        job,
+        category,
       });
     } catch (error) {
       next(error);

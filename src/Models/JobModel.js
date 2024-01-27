@@ -30,19 +30,20 @@ const JobSchema = mongoose.Schema(
     },
     jobTitle: {
       type: String,
-      required: true,
+      default: "",
     },
     location: {
       type: String,
       default: "",
     },
     region: {
-      type: String,
-      default: "",
+      type: [String],
+      default: [],
     },
     jobTypes: [
       {
-        type: String,
+        type: [String],
+        default: [],
       },
     ],
     category: {
@@ -50,7 +51,8 @@ const JobSchema = mongoose.Schema(
     },
     specialTags: [
       {
-        type: String,
+        type: [String],
+        default: [],
       },
     ],
     jobDescription: {
