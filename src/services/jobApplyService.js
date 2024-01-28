@@ -17,3 +17,15 @@ export async function getJobApplicationsService(jobId) {
     throw e;
   }
 }
+
+// find all application of a candidate service
+export async function findApplications(query) {
+  try {
+    const applications = await JobApply.find(query)
+      .populate("jobItem", ["jobTitle"])
+      .lean(true);
+    return applications;
+  } catch (e) {
+    throw e;
+  }
+}

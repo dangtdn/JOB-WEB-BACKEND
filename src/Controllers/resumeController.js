@@ -22,21 +22,19 @@ const ResumeController = {
       //             },
       //       }
       //   }
-      const adminRole = req.body.user.role.isAdmin;
-      const userID = req.body.user.userId;
-      if (adminRole === true) {
-        const resumes = await ResumeModel.find({}).lean(true);
-        return res.status(201).json({
-          success: true,
-          resumes,
-        });
-      }
-      const resumes1 = await ResumeModel.find({
-        user: userID,
-      });
+      // const adminRole = req.body.user.role.isAdmin;
+      // const userID = req.body.user.userId;
+      // if (adminRole === true) {
+      //   const resumes = await ResumeModel.find({}).lean(true);
+      //   return res.status(201).json({
+      //     success: true,
+      //     resumes,
+      //   });
+      // }
+      const resumes = await ResumeModel.find();
       res.status(201).json({
         success: true,
-        resumes1,
+        resumes,
       });
     } catch (error) {
       next(error);

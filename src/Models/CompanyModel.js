@@ -41,7 +41,7 @@ const CompanySchema = mongoose.Schema(
     companySize: { type: String, default: "" },
     description: {
       type: String,
-      required: true,
+      default: "",
     },
     location: { type: String, default: "" },
     locationMap: {

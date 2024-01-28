@@ -13,7 +13,7 @@ const router = express.Router();
 //company routes
 
 // /api/company/create
-router.post("/admin/company/create", isAuthenticated, isAdmin, createCampany);
+router.post("/admin/company/create", isAuthenticated, createCampany);
 // /api/company/id
 router.get("/company/:id", singleCompany);
 // /api/company/update/company_id
