@@ -2,13 +2,19 @@ import express from "express";
 import userController from "../Controllers/userController.js";
 import { isAdmin, isAuthenticated } from "../Middlewares/auth.js";
 
-const { allUsers, singleUser, editUser, deleteUser, createUserJobsHistory } =
-  userController;
+const {
+  allUsers,
+  singleUser,
+  editUser,
+  deleteUser,
+  createUserJobsHistory,
+  getDashboardStat,
+} = userController;
 const router = express.Router();
 
 //user routes
 // /api/allusers
-router.get("/admin/users", isAuthenticated, allUsers);
+router.get("/admin/users", isAuthenticated, isAdmin, allUsers);
 // /api/user/id
 router.get("/user/:id", isAuthenticated, singleUser);
 // /api/user/update/id
@@ -17,7 +23,8 @@ router.put("/admin/user/update/:id", isAuthenticated, isAdmin, editUser);
 router.delete("/admin/user/delete/:id", isAuthenticated, isAdmin, deleteUser);
 // /api/user/jobhistory
 router.post("/user/job-histories", isAuthenticated, createUserJobsHistory);
-
+// /api/user/statistics
+router.get("/user/statistics", isAuthenticated, isAdmin);
 // router.post("/upload", (req, res) => {
 //   // Get the file that was set to our field named "image"
 //   const { image } = req.files;

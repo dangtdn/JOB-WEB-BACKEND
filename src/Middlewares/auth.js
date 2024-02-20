@@ -4,61 +4,57 @@ import ErrorResponse from "../utils/errorResponse.js";
 
 // check is user is authenticated
 export const isAuthenticated = async (req, res, next) => {
-  // const { token } = req.cookies;
   const { headers } = req;
-  console.log("headers", headers);
-  const token = headers.authorization?.substring(
-    7,
-    headers.authorization.length
-  );
-  // Make sure token exists
+  const token = headers.authorization?.split(" ")[1];
+
   if (!token) {
     return next(new ErrorResponse("Not authorized to access this route", 401));
   }
-  next();
 
-  // try {
-  //   // Verify token
-  //   // const decoded = jwt.verify(token, process.env.JWT_SECRET);
-  //   // req.user = await User.findById(decoded.id);
-  //   // const user = await getUser(req, next);
-  //   next();
-  // } catch (error) {
-  //   return next(new ErrorResponse("Not authorized to access this route", 401));
-  // }
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    console.log("decoded: ", decoded);
+    // const userID = decoded == null ? void 0 : decoded._id;
+    // const user = await User.findById(userID);
+    // if (!user) {
+    //   return next(new ErrorResponse("Invalid token", 401));
+    // }
+
+    // // Lưu thông tin về user vào request để sử dụng ở middleware khác nếu cần
+    // req.user = user;
+
+    next();
+  } catch (error) {
+    return next(new ErrorResponse("Invalid token 2", 401));
+  }
 };
 
 //middleware for admin
 export const isAdmin = async (req, res, next) => {
-  // if (req.user.role === 0) {
-  //   return next(new ErrorResponse("Access denied, you must an admin", 403));
-  // }
-  // next();
+  const { headers } = req;
+  const token = headers.authorization?.split(" ")[1];
 
-  // const { headers } = req;
-  // const token = headers.authorization?.substring(
-  //   7,
-  //   headers.authorization.length
-  // );
-  // // Make sure token exists
-  // if (!token) {
-  //   return next(new ErrorResponse("Not authorized to access this route", 401));
-  // }
+  if (!token) {
+    return next(new ErrorResponse("Not authorized to access this route", 401));
+  }
 
   try {
-    // Verify token
-    // const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    // req.user = await User.findById(decoded.id);
-    // const user = await getUser(req, next);
-    // console.log("user: ", user.role.isAdmin);
-    const isAdmin = req.body.isAdmin ?? false;
-    console.log("object: ", req.body);
-    if (!isAdmin) {
-      return next(new ErrorResponse("Access denied, you must an admin", 403));
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const user = await User.findById(decoded.id);
+    console.log("user.role.isAdmin: ", user.role.isAdmin);
+
+    if (!user || !user.role || !user.role.isAdmin) {
+      return next(
+        new ErrorResponse("Access denied, you must be an admin", 403)
+      );
     }
+
+    // Lưu thông tin về user vào request để sử dụng ở middleware khác nếu cần
+    req.user = user;
+
     next();
   } catch (error) {
-    return next(new ErrorResponse("Access denied, you must an admin", 403));
+    return next(new ErrorResponse("Access denied, you must be an admin", 403));
   }
 };
 

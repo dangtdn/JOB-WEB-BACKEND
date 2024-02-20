@@ -16,7 +16,7 @@ const userController = {
         .skip(pageSize * (page - 1))
         .limit(pageSize);
 
-      res.status(200).json({
+      res.status(200).send({
         success: true,
         users,
         page,
@@ -97,6 +97,23 @@ const userController = {
         success: true,
         currentUser,
       });
+      next();
+    } catch (error) {
+      return next(error);
+    }
+  },
+
+  //get user dashboard statistics
+  getDashboardStat: async (req, res, next) => {
+    try {
+      // const { headers } = req;
+      // const accessToken = headers.authorization?.substring(
+      //   7,
+      //   headers.authorization.length
+      // );
+      // const decoded = jwt.verify(accessToken, process.env.JWT_SECRET);
+      // const user = await User.findById(decoded.id);
+      console.log("req.user: ", req.user);
       next();
     } catch (error) {
       return next(error);
