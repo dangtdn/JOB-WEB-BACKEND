@@ -8,7 +8,7 @@ const CategorySchema = new mongoose.Schema(
       required: [true, "CategoryName is required"],
       maxlength: 70,
     },
-
+    logo: { type: String, default: "" },
     user: {
       type: mongoose.Types.ObjectId,
       ref: "User",

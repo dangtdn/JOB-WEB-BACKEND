@@ -30,7 +30,6 @@ export const isAuthenticated = async (req, res, next) => {
 
 //middleware for admin
 export const isAdmin = async (req, res, next) => {
-  // console.log("req.user: ", req.user);
   // if (req.user.role === 0) {
   //   return next(new ErrorResponse("Access denied, you must an admin", 403));
   // }
@@ -50,8 +49,11 @@ export const isAdmin = async (req, res, next) => {
     // Verify token
     // const decoded = jwt.verify(token, process.env.JWT_SECRET);
     // req.user = await User.findById(decoded.id);
-    const user = await getUser(req, next);
-    if (user.role.isAdmin) {
+    // const user = await getUser(req, next);
+    // console.log("user: ", user.role.isAdmin);
+    const isAdmin = req.body.isAdmin ?? false;
+    console.log("object: ", req.body);
+    if (!isAdmin) {
       return next(new ErrorResponse("Access denied, you must an admin", 403));
     }
     next();
@@ -77,7 +79,7 @@ export const getUser = async (req, next) => {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     console.log("decoded: ", decoded);
     const user = await User.findById(decoded.id);
-    console.log("user: ", user);
+    // console.log("user: ", user);
     if (!user) {
       return next(
         new ErrorResponse("You must be logged in to access this route", 412)

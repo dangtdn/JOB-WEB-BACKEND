@@ -1,4 +1,5 @@
 import { Company } from "../Models/CompanyModel.js";
+import { Job } from "../Models/JobModel.js";
 
 const companyController = {
   //create company
@@ -18,11 +19,25 @@ const companyController = {
   singleCompany: async (req, res, next) => {
     try {
       const company = await Company.findById(req.params.id);
-      res.status(200).json({
+      // find the all job based company id
+      const jobs = await Job.find({
+        company: req.params.id,
+        "status.isApproved": true,
+        "status.isPublished": true,
+        "status.isActive": true,
+      }).lean(true);
+
+      return res.status(200).send({
         success: true,
+        message: "Company Profile Found",
         company,
+        jobs,
       });
     } catch (error) {
+      res.status(500).send({
+        message: "Server Error",
+        error: error.message,
+      });
       next(error);
     }
   },

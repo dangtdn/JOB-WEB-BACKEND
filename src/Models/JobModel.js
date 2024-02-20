@@ -51,21 +51,17 @@ const JobSchema = mongoose.Schema(
       type: [String],
       default: [],
     },
-    jobTypes: [
-      {
-        type: [String],
-        default: [],
-      },
-    ],
+    jobTypes: {
+      type: [String],
+      default: [],
+    },
     category: {
       type: String,
     },
-    specialTags: [
-      {
-        type: [String],
-        default: [],
-      },
-    ],
+    specialTags: {
+      type: [String],
+      default: [],
+    },
     jobDescription: {
       type: String,
       default: "",
