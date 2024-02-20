@@ -5,13 +5,10 @@ const categoryController = {
   //create job category
   createCategory: async (req, res, next) => {
     try {
-      const job = await Category.create({
-        categoryName: req.body.categoryName,
-        user: req.user.id,
-      });
+      const category = await Category.create(req.body.category);
       res.status(201).json({
         success: true,
-        job,
+        category,
       });
     } catch (error) {
       next(error);

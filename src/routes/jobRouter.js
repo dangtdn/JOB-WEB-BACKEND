@@ -9,7 +9,7 @@ const router = express.Router();
 // /api/job/create
 router.post("/admin/job/create", createJob);
 // /api/job/id
-router.get("/job/:id", singleJob);
+router.get("/jobs/:id", singleJob);
 // /api/job/update/job_id
 router.put("/admin/job/update/:id", isAuthenticated, updateJob);
 // /api/jobs

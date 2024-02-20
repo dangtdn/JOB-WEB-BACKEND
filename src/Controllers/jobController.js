@@ -45,12 +45,45 @@ const JobController = {
   //single job
   singleJob: async (req, res, next) => {
     try {
-      const job = await Job.findById(req.params.id);
-      res.status(200).json({
+      const job = await Job.findById(req.params.id)
+        .populate("company", [
+          "companyName",
+          "companyTagline",
+          "logo",
+          "companyEmail",
+          "phoneNumber",
+          "companyWebsite",
+          "socialLink",
+        ])
+        .lean(true);
+      // pick category from job
+      const jobCategory = { category: job.category };
+      const relatedJobs = await Job.find({
+        category: jobCategory.category,
+        _id: {
+          $ne: req.params.id,
+        },
+      })
+        .populate("company")
+        .limit(4)
+        .lean(true);
+      if (!job) {
+        return res.status(404).send({
+          message: "Job Not Found",
+        });
+      }
+
+      return res.status(200).send({
+        message: "Job Found",
         success: true,
         job,
+        relatedJobs: relatedJobs,
       });
     } catch (error) {
+      res.status(500).send({
+        message: "Server Error",
+        error: error.message,
+      });
       next(error);
     }
   },
