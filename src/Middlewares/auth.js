@@ -13,15 +13,15 @@ export const isAuthenticated = async (req, res, next) => {
 
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    console.log("decoded: ", decoded);
-    // const userID = decoded == null ? void 0 : decoded._id;
-    // const user = await User.findById(userID);
-    // if (!user) {
-    //   return next(new ErrorResponse("Invalid token", 401));
-    // }
+    const userID = decoded == null ? void 0 : decoded.id;
+    const user = await User.findById(userID);
+    console.log("user: ", user);
+    if (!user) {
+      return next(new ErrorResponse("Invalid token", 401));
+    }
 
     // // Lưu thông tin về user vào request để sử dụng ở middleware khác nếu cần
-    // req.user = user;
+    req.user = user;
 
     next();
   } catch (error) {

@@ -17,14 +17,15 @@ const router = express.Router();
 router.get("/admin/users", isAuthenticated, isAdmin, allUsers);
 // /api/user/id
 router.get("/user/:id", isAuthenticated, singleUser);
+// /api/user/statistics
+router.get("/user/statistics", getDashboardStat);
 // /api/user/update/id
 router.put("/admin/user/update/:id", isAuthenticated, isAdmin, editUser);
 // /api/admin/user/delete/id
 router.delete("/admin/user/delete/:id", isAuthenticated, isAdmin, deleteUser);
 // /api/user/jobhistory
 router.post("/user/job-histories", isAuthenticated, createUserJobsHistory);
-// /api/user/statistics
-router.get("/user/statistics", isAuthenticated, isAdmin);
+
 // router.post("/upload", (req, res) => {
 //   // Get the file that was set to our field named "image"
 //   const { image } = req.files;

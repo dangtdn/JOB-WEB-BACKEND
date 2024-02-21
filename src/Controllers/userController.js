@@ -107,13 +107,14 @@ const userController = {
   getDashboardStat: async (req, res, next) => {
     try {
       // const { headers } = req;
-      // const accessToken = headers.authorization?.substring(
-      //   7,
-      //   headers.authorization.length
-      // );
-      // const decoded = jwt.verify(accessToken, process.env.JWT_SECRET);
+      // const token = headers.authorization?.split(" ")[1];
+      // const decoded = jwt.verify(token, process.env.JWT_SECRET);
       // const user = await User.findById(decoded.id);
-      console.log("req.user: ", req.user);
+
+      res.status(200).send({
+        success: true,
+        // user,
+      });
       next();
     } catch (error) {
       return next(error);
