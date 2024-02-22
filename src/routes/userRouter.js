@@ -18,7 +18,7 @@ router.get("/admin/users", isAuthenticated, isAdmin, allUsers);
 // /api/user/id
 router.get("/user/:id", isAuthenticated, singleUser);
 // /api/user/statistics
-router.get("/user/statistics", getDashboardStat);
+router.get("/statistics", getDashboardStat);
 // /api/user/update/id
 router.put("/admin/user/update/:id", isAuthenticated, isAdmin, editUser);
 // /api/admin/user/delete/id

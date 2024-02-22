@@ -3,6 +3,7 @@ import { isAuthenticated, isAdmin } from "../Middlewares/auth.js";
 import jobController from "../Controllers/jobController.js";
 
 const { createJob, singleJob, updateJob, getJobs } = jobController;
+
 const router = express.Router();
 //jobs routes
 
