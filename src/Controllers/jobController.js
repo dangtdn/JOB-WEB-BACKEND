@@ -1,6 +1,13 @@
 import { Job } from "../Models/JobModel.js";
 import { Category } from "../Models/CategoryModel.js";
 import Cloud from "../utils/cloudinary.js";
+import { requireUser } from "../Middlewares/auth.js";
+import {
+  createEmail,
+  findEmailByEmailType,
+} from "../services/admin/emailService.js";
+import { sendNotificationEmail } from "../Middlewares/nodeMailer.js";
+import { findAdminJob } from "../services/jobService.js";
 
 const JobController = {
   //create job
@@ -105,69 +112,7 @@ const JobController = {
     }
   },
 
-  //update job by id.
-  showJobs: async (req, res, next) => {
-    //enable search
-    const keyword = req.query.keyword
-      ? {
-          title: {
-            $regex: req.query.keyword,
-            $options: "i",
-          },
-        }
-      : {};
-
-    // filter jobs by category ids
-    let ids = [];
-    const jobCategory = await Category.find({}, { _id: 1 });
-    jobCategory.forEach((cat) => {
-      ids.push(cat._id);
-    });
-
-    let cat = req.query.cat;
-    let categ = cat !== "" ? cat : ids;
-
-    //jobs by location
-    let locations = [];
-    const jobByLocation = await Job.find({}, { location: 1 });
-    jobByLocation.forEach((val) => {
-      locations.push(val.location);
-    });
-    let setUniqueLocation = [...new Set(locations)];
-    let location = req.query.location;
-    let locationFilter = location !== "" ? location : setUniqueLocation;
-
-    //enable pagination
-    const pageSize = 5;
-    const page = Number(req.query.pageNumber) || 1;
-    //const count = await Job.find({}).estimatedDocumentCount();
-    const count = await Job.find({
-      ...keyword,
-      jobType: categ,
-      location: locationFilter,
-    }).countDocuments();
-
-    try {
-      const jobs = await Job.find({
-        ...keyword,
-        jobType: categ,
-        location: locationFilter,
-      })
-        .sort({ createdAt: -1 })
-        .skip(pageSize * (page - 1))
-        .limit(pageSize);
-      res.status(200).json({
-        success: true,
-        jobs,
-        page,
-        pages: Math.ceil(count / pageSize),
-        count,
-        setUniqueLocation,
-      });
-    } catch (error) {
-      next(error);
-    }
-  },
+  //get jobs by id.
   getJobs: async (req, res, next) => {
     try {
       async function getJobsService() {
@@ -199,6 +144,110 @@ const JobController = {
       next(error);
     }
   },
+
+  //get jobs private.
+  getJobsPrivate: async (req, res, next) => {
+    try {
+      const { headers } = req;
+      const accessToken = headers.authorization?.split(" ")[1];
+
+      const jobs = await getJobsPrivate(accessToken);
+      res.status(200).send({
+        message: "Successfully fetched all private jobs",
+        data: jobs,
+      });
+      next();
+    } catch (e) {
+      res.status(500).send({
+        message: "Server Error",
+        error: e.message,
+      });
+      next(e);
+    }
+  },
+
+  //delete job by id.
+  deleteJobs: async (req, res, next) => {
+    try {
+      const { id } = req.query;
+      const { headers } = req;
+      const accessToken = headers.authorization?.substring(
+        7,
+        headers.authorization.length
+      );
+
+      const reqQuery = {
+        accessToken,
+        jobId: id,
+      };
+      const job = await deleteJob(reqQuery);
+
+      res.status(200).send({
+        message: "Successfully deleted job",
+      });
+      next();
+    } catch (error) {
+      res.status(500).send({
+        message: "Server Error",
+        error: error.message,
+      });
+      next(error);
+    }
+  },
 };
 
 export default JobController;
+
+export async function deleteJob(reqQuery) {
+  try {
+    const user = await requireUser(reqQuery.accessToken);
+    const userID = user.id;
+    const jobId = reqQuery.jobId;
+    const job = await deleteJobService(jobId);
+    if (!job) {
+      throw new Error("Job Not Found");
+    }
+    const emailType = "JOB_DELETED";
+    let emails;
+    emails = await findEmailByEmailType(emailType);
+    if (emails.length === 0) {
+      const templateInput = {
+        senderAddress: "Meta-Jobs",
+        subject: "Your Job is Deleted",
+        message: "You have deleted a job",
+        emailType: "JOB_DELETED",
+      };
+      await createEmail(templateInput);
+      emails = await findEmailByEmailType("JOB_DELETED");
+    }
+    const emailData = emails[0];
+    const inputEmailData = {
+      userEmail: user.email,
+      emailData,
+      jobInfo: job,
+      userId: userID,
+      emailType,
+    };
+    sendNotificationEmail(inputEmailData);
+    return job;
+  } catch (e) {
+    throw e;
+  }
+}
+// find all job handller private
+export async function getJobsPrivate(accessToken) {
+  try {
+    const user = await requireUser(accessToken);
+    const userID = user == null ? void 0 : user.id;
+    console.log("userID: ", userID);
+    const adminRole = user.role.isAdmin;
+    if (adminRole === true) {
+      const jobs = await findAdminJob();
+      return jobs;
+    }
+    const jobs1 = await findJob(userID);
+    return jobs1;
+  } catch (e) {
+    throw e;
+  }
+}

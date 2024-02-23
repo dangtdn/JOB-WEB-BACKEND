@@ -1,25 +1,27 @@
 import { getUser } from "../Middlewares/auth.js";
-import NotificationModel from "../Models/notificationModel.js";
+import {
+  getNotification,
+  updateNotificationService,
+} from "../services/notificationService.js";
 
 const NotificationController = {
   getNotification: async (req, res, next) => {
     try {
-      const user = await getUser(accessToken);
-      const userID = user == null ? void 0 : user.id;
-      // short by recent array elemnt within notification object
-      const notifications = await NotificationModel.findOne(
-        {
-          user: userID,
-        }, // limit to 8 notifications
-        {
-          notification: {
-            $slice: 8.0,
-          },
-        }
-      );
-      return res.status(201).json(notifications);
+      const { headers } = req;
+      const accessToken = headers.authorization?.split(" ")[1];
+
+      const notifications = await getNotification(accessToken);
+      res.status(200).send({
+        message: "Successfully fetched recent activities",
+        data: notifications,
+      });
+      next();
     } catch (e) {
-      throw e;
+      res.status(500).send({
+        message: "Server Error",
+        error: e.message,
+      });
+      next(e);
     }
   },
   updateNotification: async (req, res, next) => {
