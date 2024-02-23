@@ -1,5 +1,7 @@
 import { User } from "../Models/UserModel.js";
+import { getDashboardStat } from "../services/dashboardService.js";
 import ErrorResponse from "../utils/errorResponse.js";
+import jwt from "jsonwebtoken";
 
 const userController = {
   //load all users
@@ -106,17 +108,23 @@ const userController = {
   //get user dashboard statistics
   getDashboardStat: async (req, res, next) => {
     try {
-      // const { headers } = req;
-      // const token = headers.authorization?.split(" ")[1];
-      // const decoded = jwt.verify(token, process.env.JWT_SECRET);
-      // const user = await User.findById(decoded.id);
-
+      const { headers } = req;
+      const token = headers.authorization?.split(" ")[1];
+      const decoded = jwt.verify(token, process.env.JWT_SECRET);
+      const user = await User.findById(decoded.id);
+      const data = await getDashboardStat(user);
+      console.log("data: ", data);
       res.status(200).send({
         success: true,
-        // user,
+        message: "Successfully fetched user dashboard statistics",
+        data,
       });
       next();
     } catch (error) {
+      res.status(500).send({
+        message: "Server Error",
+        error: error.message,
+      });
       return next(error);
     }
   },

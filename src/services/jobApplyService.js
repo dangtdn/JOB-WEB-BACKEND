@@ -29,3 +29,13 @@ export async function findApplications(query) {
     throw e;
   }
 }
+
+// count all application of a candidate service
+export async function countApplications(query) {
+  try {
+    const applications = await JobApply.countDocuments(query);
+    return applications;
+  } catch (e) {
+    throw e;
+  }
+}
