@@ -20,7 +20,7 @@ export async function deleteJobService(jobID) {
 export async function findAdminJob() {
   try {
     // const jobs = await JobModel.find().lean(true)
-    const jobs = await JobModel.aggregate([
+    const jobs = await Job.aggregate([
       {
         $lookup: {
           from: "jobapplies",

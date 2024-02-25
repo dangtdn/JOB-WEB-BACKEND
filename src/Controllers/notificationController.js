@@ -1,4 +1,3 @@
-import { getUser } from "../Middlewares/auth.js";
 import {
   getNotification,
   updateNotificationService,
@@ -15,32 +14,59 @@ const NotificationController = {
         message: "Successfully fetched recent activities",
         data: notifications,
       });
-      next();
     } catch (e) {
       res.status(500).send({
         message: "Server Error",
         error: e.message,
       });
-      next(e);
     }
   },
   updateNotification: async (req, res, next) => {
-    //   const { accessToken, notificationId, status } = reqQuery;
-    const user = await getUser(req, next);
-    const userId = user._id;
-    const notificationID = req.body.notificationId;
-    const notificationStatus = req.body.status;
     try {
-      const updatedNotification = await updateNotificationService(
-        userId,
-        notificationID,
-        notificationStatus
+      const { id } = req.query;
+      const status = req.body.status;
+
+      const { headers } = req;
+      const accessToken = headers.authorization?.substring(
+        7,
+        headers.authorization.length
       );
-      return updatedNotification;
+
+      const reqQuery = { accessToken, notificationId: id, status };
+
+      const notifications = await updateNotification(reqQuery);
+
+      res.status(200).send({
+        message: "Successfully updated notofication status",
+      });
     } catch (e) {
-      throw e;
+      res.status(500).send({
+        message: "Server Error",
+        error: e.message,
+      });
     }
   },
 };
 
 export default NotificationController;
+
+// controller
+// update notification status
+export async function updateNotification(reqQuery) {
+  const { accessToken, notificationId, status } = reqQuery;
+  await connectDB();
+  const user = await requireUser(accessToken);
+  const userId = user._id;
+  const notificationID = notificationId;
+  const notificationStatus = status;
+  try {
+    const updatedNotification = await updateNotificationService(
+      userId,
+      notificationID,
+      notificationStatus
+    );
+    return updatedNotification;
+  } catch (e) {
+    throw e;
+  }
+}

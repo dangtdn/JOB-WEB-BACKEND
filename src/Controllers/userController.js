@@ -111,7 +111,8 @@ const userController = {
       const { headers } = req;
       const token = headers.authorization?.split(" ")[1];
       const decoded = jwt.verify(token, process.env.JWT_SECRET);
-      const user = await User.findById(decoded.id);
+      const user = await User.findById(decoded._id);
+      console.log("user: ", user);
       const data = await getDashboardStat(user);
       console.log("data: ", data);
       res.status(200).send({

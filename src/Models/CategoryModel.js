@@ -1,21 +1,34 @@
 import mongoose from "mongoose";
-
-const CategorySchema = new mongoose.Schema(
-  {
-    categoryName: {
-      type: String,
-      trim: true,
-      required: [true, "CategoryName is required"],
-      maxlength: 70,
+const categorySchema = new mongoose.Schema({
+  status: {
+    isFeatured: {
+      type: Boolean,
+      default: false,
     },
-    logo: { type: String, default: "" },
-    user: {
-      type: mongoose.Types.ObjectId,
-      ref: "User",
-      required: true,
+    isActive: {
+      type: Boolean,
+      default: true,
     },
   },
-  { timestamps: true }
-);
-
-export const Category = mongoose.model("Category", CategorySchema);
+  categoryTitle: {
+    type: String,
+    required: true,
+    unique: true,
+  },
+  subCategory: [
+    {
+      type: String,
+    },
+  ],
+  avatar: {
+    type: String,
+    default: "",
+  },
+  iconUrl: {
+    type: String,
+    default: "",
+  },
+});
+const CategoryModel =
+  mongoose.model("Category", categorySchema) || mongoose.models.Category;
+export default CategoryModel;

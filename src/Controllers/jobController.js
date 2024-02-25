@@ -1,5 +1,4 @@
 import { Job } from "../Models/JobModel.js";
-import { Category } from "../Models/CategoryModel.js";
 import Cloud from "../utils/cloudinary.js";
 import { requireUser } from "../Middlewares/auth.js";
 import {
@@ -40,12 +39,14 @@ const JobController = {
         };
       }
       const job = await Job.create(jobInput);
-      res.status(201).json({
-        success: true,
-        job,
+      res.status(200).send({
+        message: "Successfully created a job",
       });
-    } catch (error) {
-      next(error);
+    } catch (e) {
+      res.status(500).send({
+        message: "Server error",
+        error: e.message,
+      });
     }
   },
 
@@ -81,38 +82,43 @@ const JobController = {
       }
 
       return res.status(200).send({
-        message: "Job Found",
+        message: "Successfully fetched job",
         success: true,
         job,
         relatedJobs: relatedJobs,
       });
-    } catch (error) {
+    } catch (e) {
       res.status(500).send({
-        message: "Server Error",
-        error: error.message,
+        message: "Server error",
+        error: e.message,
       });
-      next(error);
     }
   },
 
   //update job by id.
   updateJob: async (req, res, next) => {
     try {
-      const job = await Job.findByIdAndUpdate(req.params.job_id, req.body, {
+      const { id } = req.params;
+      const { headers } = req;
+      const accessToken = headers.authorization?.split(" ")[1];
+      await requireAdmin(accessToken);
+      const job = await Job.findByIdAndUpdate(id, req.body, {
         new: true,
       })
-        .populate("Category", "CategoryName")
+        .populate("Category", "CategoryTitle")
         .populate("user", "firstName lastName");
       res.status(200).json({
-        success: true,
-        job,
+        message: "Successfully updated job",
       });
-    } catch (error) {
-      next(error);
+    } catch (e) {
+      res.status(500).send({
+        message: "Server error",
+        error: e.message,
+      });
     }
   },
 
-  //get jobs by id.
+  //get jobs.
   getJobs: async (req, res, next) => {
     try {
       async function getJobsService() {
@@ -137,11 +143,15 @@ const JobController = {
 
       const jobs = await getJobsService();
       res.status(200).json({
+        message: "Successfully fetched all jobs",
         success: true,
         jobs,
       });
-    } catch (error) {
-      next(error);
+    } catch (e) {
+      res.status(500).send({
+        message: "Server error",
+        error: e.message,
+      });
     }
   },
 
@@ -150,19 +160,17 @@ const JobController = {
     try {
       const { headers } = req;
       const accessToken = headers.authorization?.split(" ")[1];
-
+      console.log("accessToken: ", headers.authorization);
       const jobs = await getJobsPrivate(accessToken);
       res.status(200).send({
         message: "Successfully fetched all private jobs",
         data: jobs,
       });
-      next();
     } catch (e) {
       res.status(500).send({
         message: "Server Error",
         error: e.message,
       });
-      next(e);
     }
   },
 
@@ -185,13 +193,11 @@ const JobController = {
       res.status(200).send({
         message: "Successfully deleted job",
       });
-      next();
     } catch (error) {
       res.status(500).send({
         message: "Server Error",
         error: error.message,
       });
-      next(error);
     }
   },
 };

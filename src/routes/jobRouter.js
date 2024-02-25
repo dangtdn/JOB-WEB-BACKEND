@@ -1,5 +1,4 @@
 import express from "express";
-import { isAuthenticated, isAdmin } from "../Middlewares/auth.js";
 import jobController from "../Controllers/jobController.js";
 
 const { createJob, singleJob, updateJob, getJobs, deleteJobs, getJobsPrivate } =
@@ -13,12 +12,12 @@ router.post("/admin/job/create", createJob);
 // /api/job/id
 router.get("/jobs/:id", singleJob);
 // /api/job/update/job_id
-router.put("/admin/job/update/:id", isAuthenticated, updateJob);
+router.put("/admin/job/update/:id", updateJob);
 // /api/jobs
 router.get("/jobs", getJobs);
 // /api/jobs
-router.get("/admin/jobs/private", isAuthenticated, getJobsPrivate);
+router.get("/admin/jobs/private", getJobsPrivate);
 // /api/jobs
-router.delete("/jobs/:id", isAuthenticated, deleteJobs);
+router.delete("/jobs/:id", deleteJobs);
 
 export default router;

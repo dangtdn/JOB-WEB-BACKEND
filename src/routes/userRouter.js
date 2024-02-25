@@ -1,6 +1,5 @@
 import express from "express";
 import userController from "../Controllers/userController.js";
-import { isAdmin, isAuthenticated } from "../Middlewares/auth.js";
 
 const {
   allUsers,
@@ -14,17 +13,17 @@ const router = express.Router();
 
 //user routes
 // /api/allusers
-router.get("/admin/users", isAuthenticated, isAdmin, allUsers);
+router.get("/admin/users", allUsers);
 // /api/user/id
-router.get("/user/:id", isAuthenticated, singleUser);
+router.get("/user/:id", singleUser);
 // /api/user/statistics
 router.get("/statistics", getDashboardStat);
 // /api/user/update/id
-router.put("/admin/user/update/:id", isAuthenticated, isAdmin, editUser);
+router.put("/admin/user/update/:id", editUser);
 // /api/admin/user/delete/id
-router.delete("/admin/user/delete/:id", isAuthenticated, isAdmin, deleteUser);
+router.delete("/admin/user/delete/:id", deleteUser);
 // /api/user/jobhistory
-router.post("/user/job-histories", isAuthenticated, createUserJobsHistory);
+router.post("/user/job-histories", createUserJobsHistory);
 
 // router.post("/upload", (req, res) => {
 //   // Get the file that was set to our field named "image"
