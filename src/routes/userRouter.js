@@ -4,7 +4,7 @@ import userController from "../Controllers/userController.js";
 const {
   allUsers,
   singleUser,
-  editUser,
+  updateUser,
   deleteUser,
   createUserJobsHistory,
   getDashboardStat,
@@ -15,11 +15,11 @@ const router = express.Router();
 // /api/allusers
 router.get("/admin/users", allUsers);
 // /api/user/id
-router.get("/user/:id", singleUser);
+router.get("/current-user", singleUser);
 // /api/user/statistics
 router.get("/statistics", getDashboardStat);
 // /api/user/update/id
-router.put("/admin/user/update/:id", editUser);
+router.put("/admin/user/update/:id", updateUser);
 // /api/admin/user/delete/id
 router.delete("/admin/user/delete/:id", deleteUser);
 // /api/user/jobhistory

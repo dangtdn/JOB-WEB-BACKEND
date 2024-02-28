@@ -1,12 +1,12 @@
 import { Job } from "../Models/JobModel.js";
 import Cloud from "../utils/cloudinary.js";
-import { requireUser } from "../Middlewares/auth.js";
+import { requireAdmin, requireUser } from "../Middlewares/auth.js";
 import {
   createEmail,
   findEmailByEmailType,
 } from "../services/admin/emailService.js";
 import { sendNotificationEmail } from "../Middlewares/nodeMailer.js";
-import { findAdminJob } from "../services/jobService.js";
+import { deleteJobService, findAdminJob } from "../services/jobService.js";
 
 const JobController = {
   //create job
@@ -101,12 +101,25 @@ const JobController = {
       const { id } = req.params;
       const { headers } = req;
       const accessToken = headers.authorization?.split(" ")[1];
+      let jobInput;
       await requireAdmin(accessToken);
-      const job = await Job.findByIdAndUpdate(id, req.body, {
+
+      if (req.body.headerImage) {
+        // Upload image to cloudinary
+        const headerImageData = await Cloud.uploader.upload(headerImage);
+        jobInput = {
+          ...req.body.job,
+          avatar: headerImageData.secure_url,
+          avatarCloudinary_id: headerImageData.public_id,
+        };
+      } else {
+        jobInput = {
+          ...req.body.job,
+        };
+      }
+      const job = await Job.findByIdAndUpdate(id, jobInput, {
         new: true,
-      })
-        .populate("Category", "CategoryTitle")
-        .populate("user", "firstName lastName");
+      });
       res.status(200).json({
         message: "Successfully updated job",
       });
@@ -177,12 +190,9 @@ const JobController = {
   //delete job by id.
   deleteJobs: async (req, res, next) => {
     try {
-      const { id } = req.query;
+      const { id } = req.params;
       const { headers } = req;
-      const accessToken = headers.authorization?.substring(
-        7,
-        headers.authorization.length
-      );
+      const accessToken = headers.authorization?.split(" ")[1];
 
       const reqQuery = {
         accessToken,
@@ -213,28 +223,28 @@ export async function deleteJob(reqQuery) {
     if (!job) {
       throw new Error("Job Not Found");
     }
-    const emailType = "JOB_DELETED";
-    let emails;
-    emails = await findEmailByEmailType(emailType);
-    if (emails.length === 0) {
-      const templateInput = {
-        senderAddress: "Meta-Jobs",
-        subject: "Your Job is Deleted",
-        message: "You have deleted a job",
-        emailType: "JOB_DELETED",
-      };
-      await createEmail(templateInput);
-      emails = await findEmailByEmailType("JOB_DELETED");
-    }
-    const emailData = emails[0];
-    const inputEmailData = {
-      userEmail: user.email,
-      emailData,
-      jobInfo: job,
-      userId: userID,
-      emailType,
-    };
-    sendNotificationEmail(inputEmailData);
+    // const emailType = "JOB_DELETED";
+    // let emails;
+    // emails = await findEmailByEmailType(emailType);
+    // if (emails.length === 0) {
+    //   const templateInput = {
+    //     senderAddress: "Meta-Jobs",
+    //     subject: "Your Job is Deleted",
+    //     message: "You have deleted a job",
+    //     emailType: "JOB_DELETED",
+    //   };
+    //   await createEmail(templateInput);
+    //   emails = await findEmailByEmailType("JOB_DELETED");
+    // }
+    // const emailData = emails[0];
+    // const inputEmailData = {
+    //   userEmail: user.email,
+    //   emailData,
+    //   jobInfo: job,
+    //   userId: userID,
+    //   emailType,
+    // };
+    // sendNotificationEmail(inputEmailData);
     return job;
   } catch (e) {
     throw e;
