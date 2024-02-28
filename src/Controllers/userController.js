@@ -1,5 +1,7 @@
+import { requireUser } from "../Middlewares/auth.js";
 import { User } from "../Models/UserModel.js";
 import { getDashboardStat } from "../services/dashboardService.js";
+import { getUserService, updateUserService } from "../services/userService.js";
 import ErrorResponse from "../utils/errorResponse.js";
 import jwt from "jsonwebtoken";
 
@@ -26,38 +28,64 @@ const userController = {
         count,
       });
       next();
-    } catch (error) {
-      return next(error);
+    } catch (e) {
+      res.status(500).send({
+        message: "Server Error",
+        error: e.message,
+      });
     }
   },
 
   //show single user
   singleUser: async (req, res, next) => {
     try {
-      const user = await User.findById(req.params.id);
-      res.status(200).json({
-        success: true,
+      const { headers } = req;
+      const accessToken = headers.authorization?.split(" ")[1];
+      const user = await getUser(accessToken);
+      res.status(200).send({
+        message: "Successfully fetched user",
         user,
       });
-      next();
-    } catch (error) {
-      return next(error);
+    } catch (e) {
+      res.status(500).send({
+        message: "Server Error",
+        error: e.message,
+      });
     }
   },
 
   //edit user
-  editUser: async (req, res, next) => {
+  updateUser: async (req, res, next) => {
     try {
-      const user = await User.findByIdAndUpdate(req.params.id, req.body, {
-        new: true,
+      const { headers } = req;
+      const accessToken = headers.authorization?.split(" ")[1];
+      const { file } = req;
+      const imageData = file?.path;
+      const userData = {
+        fullName: {
+          firstName: req.body.firstName,
+          lastName: req.body.lastName,
+        },
+        email: req.body?.email,
+        phoneNumber: req.body?.phoneNumber,
+        aboutMe: req.body?.aboutMe,
+      };
+
+      const reqQuery = {
+        accessToken,
+        userData,
+      };
+
+      const user = await updateUser(reqQuery, imageData);
+
+      res.status(200).send({
+        message: "Successfully updated user",
       });
-      res.status(200).json({
-        success: true,
-        user,
+    } catch (e) {
+      res.status(500).send({
+        message: "Server Error",
+        error: e.message,
       });
-      next();
-    } catch (error) {
-      return next(error);
     }
   },
 
@@ -65,13 +93,14 @@ const userController = {
   deleteUser: async (req, res, next) => {
     try {
       const user = await User.findByIdAndRemove(req.params.id);
-      res.status(200).json({
-        success: true,
-        message: "user deleted",
+      res.status(200).send({
+        message: "Successfully deleted user",
       });
-      next();
-    } catch (error) {
-      return next(error);
+    } catch (e) {
+      res.status(500).send({
+        message: "Server Error",
+        error: e.message,
+      });
     }
   },
 
@@ -100,8 +129,11 @@ const userController = {
         currentUser,
       });
       next();
-    } catch (error) {
-      return next(error);
+    } catch (e) {
+      res.status(500).send({
+        message: "Server Error",
+        error: e.message,
+      });
     }
   },
 
@@ -126,9 +158,34 @@ const userController = {
         message: "Server Error",
         error: error.message,
       });
-      return next(error);
     }
   },
 };
 
 export default userController;
+
+// update UserHandler
+export async function updateUser(reqQuery, imageData) {
+  try {
+    const userInfo = await requireUser(reqQuery.accessToken);
+    const userId = userInfo._id;
+    const userInput = {
+      ...reqQuery.userData,
+    };
+    const user = await updateUserService(userId, userInput, imageData);
+    return user;
+  } catch (e) {
+    throw e;
+  }
+}
+// create user controller
+export async function getUser(accessToken) {
+  try {
+    const userInfo = await requireUser(accessToken);
+    const userID = userInfo._id;
+    const user = await getUserService(userID);
+    return user;
+  } catch (e) {
+    throw e;
+  }
+}
