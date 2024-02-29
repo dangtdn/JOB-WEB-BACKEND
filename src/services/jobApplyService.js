@@ -1,4 +1,5 @@
 import JobApply from "../Models/JobApplyModel.js";
+import Cloud from "../utils/cloudinary.js";
 
 // find all application of a job service
 export async function getJobApplicationsService(jobId) {
@@ -35,6 +36,30 @@ export async function countApplications(query) {
   try {
     const applications = await JobApply.countDocuments(query);
     return applications;
+  } catch (e) {
+    throw e;
+  }
+}
+
+// create a job service
+export async function createJobApplyService(input, cvFile) {
+  try {
+    let applyInput;
+    if (cvFile) {
+      // Upload image to cloudinary
+      const cvFileData = await Cloud.uploader.upload(cvFile);
+      applyInput = {
+        ...input,
+        cvFile: cvFileData.secure_url,
+        cvFileCloudinary_id: cvFileData.public_id,
+      };
+    } else {
+      applyInput = {
+        ...input,
+      };
+    }
+    const jobApplication = await JobApply.create(applyInput);
+    return jobApplication;
   } catch (e) {
     throw e;
   }

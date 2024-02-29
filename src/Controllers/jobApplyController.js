@@ -1,5 +1,9 @@
+import { requireCandidate } from "../Middlewares/auth.js";
+import { sendNotificationEmail } from "../Middlewares/nodeMailer.js";
 import JobApply from "../Models/JobApplyModel.js";
+import { findEmailByEmailType } from "../services/admin/emailService.js";
 import {
+  createJobApplyService,
   findApplications,
   getJobApplicationsService,
 } from "../services/jobApplyService.js";
@@ -8,40 +12,43 @@ const JobApplyController = {
   // create JobApply
   createJobApply: async (req, res, next) => {
     try {
-      // {
-      //     "user": "622b4d0a210fd3b5bb5a315c",
-      //     "status": "Pending",
-      //     "fullName": "Robert Browny",
-      //     "email": "rober@example.con",
-      //     "coverLetter":
-      //       "Lorem text lorem text, Lorem text lorem text, Lorem text lorem text, Lorem text lorem text, Lorem text lorem text, Lorem text lorem text, ",
-      //     "jobItem": "622f00ed7cc2cc7a44eeb531",
-      //   }
-      const request = req.body;
-      const jobApply = await JobApply.create(request);
-      res.status(201).json({
-        success: true,
+      const { file } = req;
+      const cvFile = file?.path;
+      const { headers } = req;
+      const accessToken = headers.authorization?.split(" ")[1];
+      const reqQuery = {
+        accessToken,
+        applyData: req.body,
+        cvFile,
+      };
+      const job = await createJobApply(reqQuery);
+      res.status(200).send({
         message: "You have successfully applied a job",
-        jobApply,
       });
-    } catch (error) {
-      next(error);
+    } catch (e) {
+      res.status(500).send({
+        message: "Server Error",
+        error: e.message,
+      });
     }
   },
 
   // get user apply
   getUserApplication: async (req, res, next) => {
     try {
-      const userID = req.params.id;
+      const { id } = req.params;
       const applications = await findApplications({
-        user: userID,
+        user: id,
       });
-      res.status(201).json({
-        success: true,
-        applications,
+      res.status(200).send({
+        message: "Successfully fetched all applications for this user",
+        data: applications,
       });
-    } catch (error) {
-      next(error);
+    } catch (e) {
+      res.status(500).send({
+        message: "Server Error",
+        error: e.message,
+      });
     }
   },
 
@@ -54,12 +61,15 @@ const JobApplyController = {
         applications: applicationResult.applications,
         totalApplyCount: applicationResult.applyCount,
       };
-      res.status(201).json({
-        success: true,
+      res.status(200).json({
+        message: "Successfully find all applications of this job",
         data,
       });
-    } catch (error) {
-      next(error);
+    } catch (e) {
+      res.status(500).send({
+        message: "Server Error",
+        error: e.message,
+      });
     }
   },
 
@@ -76,10 +86,51 @@ const JobApplyController = {
         success: true,
         application,
       });
-    } catch (error) {
-      next(error);
+    } catch (e) {
+      res.status(500).send({
+        message: "Server Error",
+        error: e.message,
+      });
     }
   },
 };
 
 export default JobApplyController;
+
+// create reate job handller
+export async function createJobApply(reqQuery) {
+  try {
+    const { accessToken, applyData, cvFile } = reqQuery;
+    const user = await requireCandidate(accessToken);
+    const userId = user._id;
+    // const userEmail = user.email;
+    const applyDataInput = {
+      ...applyData,
+      user: userId,
+    };
+    const jobApply = await createJobApplyService(applyDataInput, cvFile);
+    let emails;
+    emails = await findEmailByEmailType("JOB_APPLIED");
+    if (emails.length === 0) {
+      const templateInput = {
+        senderAddress: "Meta Jobs",
+        subject: "Job is Applied",
+        message: "Congrats..!! Your have applied a Job",
+        emailType: "JOB_APPLIED",
+      };
+      await createEmail(templateInput);
+      emails = await findEmailByEmailType("JOB_APPLIED");
+    }
+    // const emailData = emails[0];
+    // const approvalInput = {
+    //   userEmail: userEmail,
+    //   emailData,
+    //   userId,
+    //   emailType: "JOB_APPLIED",
+    // };
+    // await sendNotificationEmail(approvalInput);
+    return jobApply;
+  } catch (e) {
+    throw e;
+  }
+}
