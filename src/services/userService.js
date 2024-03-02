@@ -37,11 +37,9 @@ export async function updateUserService(userId, update, imageData) {
 export async function getUserService(userID) {
   try {
     // populates package
-    const user = await User.findOne({
-      _id: userID,
-    }) // .populate('package', ['validity', 'totalJobs', 'featuredJobs'])
-      .lean(true);
-    return _.omit(user, ["password", "__v", "createdAt", "updatedAt"]);
+    const user = await User.findOne({ _id: userID }).lean(true);
+    const { password, __v, createdAt, updatedAt, ...filteredUser } = user;
+    return filteredUser;
   } catch (e) {
     throw e;
   }

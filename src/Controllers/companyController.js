@@ -6,12 +6,14 @@ const companyController = {
   createCampany: async (req, res, next) => {
     try {
       const company = await Company.create(req.body);
-      res.status(200).json({
-        success: true,
-        company,
+      res.status(200).send({
+        message: "Successfully created a company profile",
       });
-    } catch (error) {
-      next(error);
+    } catch (e) {
+      res.status(500).send({
+        message: "Server Error",
+        error: e.message,
+      });
     }
   },
 
@@ -56,8 +58,11 @@ const companyController = {
         success: true,
         company,
       });
-    } catch (error) {
-      next(error);
+    } catch (e) {
+      res.status(500).send({
+        message: "Server Error",
+        error: e.message,
+      });
     }
   },
 
@@ -81,9 +86,15 @@ const companyController = {
         pages: Math.ceil(count / pageSize),
         count,
       });
-      next();
-    } catch (error) {
-      return next(error);
+      res.status(200).send({
+        message: "Successfully fetched all company",
+        companies,
+      });
+    } catch (e) {
+      res.status(500).send({
+        message: "Server Error",
+        error: e.message,
+      });
     }
   },
 
@@ -96,8 +107,11 @@ const companyController = {
         message: "company deleted",
       });
       next();
-    } catch (error) {
-      return next(error);
+    } catch (e) {
+      res.status(500).send({
+        message: "Server Error",
+        error: e.message,
+      });
     }
   },
 };
