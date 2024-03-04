@@ -79,13 +79,6 @@ const companyController = {
         .skip(pageSize * (page - 1))
         .limit(pageSize);
 
-      res.status(200).json({
-        success: true,
-        companies,
-        page,
-        pages: Math.ceil(count / pageSize),
-        count,
-      });
       res.status(200).send({
         message: "Successfully fetched all company",
         companies,
