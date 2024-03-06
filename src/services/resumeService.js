@@ -25,6 +25,7 @@ export async function createResumeService(input, inputFiles) {
       ...imageInput,
       ...fileInput,
     };
+    console.log("resumeTotalInput: ", resumeTotalInput);
     const resume = await ResumeModel.create(resumeTotalInput);
     return resume;
   } catch (e) {
@@ -113,7 +114,7 @@ export async function deleteResumeService(resumeId) {
 // find all resumes service by property (used in private, ..)
 export async function findResumeService(query) {
   try {
-    const resumes = await ResumeModel.find(query);
+    const resumes = await ResumeModel.find(query).lean(true);
     return resumes;
   } catch (e) {
     throw e;

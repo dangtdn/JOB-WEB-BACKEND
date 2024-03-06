@@ -5,6 +5,7 @@ import {
 } from "../services/admin/emailService.js";
 import {
   createResumeService,
+  deleteResumeService,
   findAdminResumeService,
   findResumeService,
   getSingleResumeService,
@@ -73,7 +74,7 @@ const ResumeController = {
     try {
       const { headers } = req;
       const accessToken = headers.authorization?.split(" ")[1];
-
+      console.log("accessToken: ", accessToken);
       const resumes = await getResumePrivate(accessToken);
 
       res.status(200).send({
@@ -89,7 +90,7 @@ const ResumeController = {
   },
   getSingleResume: async (req, res, next) => {
     try {
-      const { id } = req.query;
+      const { id } = req.params;
 
       const resume = await getSingleResume(id);
       res.status(200).send({
@@ -108,7 +109,7 @@ const ResumeController = {
   //   // update resume image and file controller
   updateResume: async (req, res, next) => {
     try {
-      const { id } = req.query;
+      const { id } = req.params;
       const { headers } = req;
       const accessToken = headers.authorization?.split(" ")[1];
       const { files } = req;
@@ -167,7 +168,7 @@ const ResumeController = {
   // delete resume controller
   deleteResume: async (req, res, next) => {
     try {
-      const { id } = req.query;
+      const { id } = req.params;
       const { headers } = req;
       const accessToken = headers.authorization?.split(" ")[1];
 
@@ -196,33 +197,33 @@ export async function createResume(reqQuery) {
   try {
     const { accessToken, resumeInput, inputFiles } = reqQuery;
     const user = await requireCandidate(accessToken);
-    const userId = user.id;
+    const userId = user._id;
     const resumeInputData = {
-      userId,
+      user: userId,
       ...resumeInput,
     };
     const resume = await createResumeService(resumeInputData, inputFiles);
-    const emailType = "RESUME_PUBLISHED";
-    let emails;
-    emails = await findEmailByEmailType(emailType);
-    if (emails.length === 0) {
-      const templateInput = {
-        senderAddress: "Meta-Jobs",
-        subject: "Your Resume is Live",
-        message: "Congrats..!! Your Resume is published",
-        emailType: "RESUME_PUBLISHED",
-      };
-      await createEmail(templateInput);
-      emails = await findEmailByEmailType("RESUME_PUBLISHED");
-    }
-    const emailData = emails[0];
-    const inputEmailData = {
-      userEmail: user.email,
-      emailData,
-      emailType,
-      userId,
-    };
-    const mailInfo = sendNotificationEmail(inputEmailData);
+    // const emailType = "RESUME_PUBLISHED";
+    // let emails;
+    // emails = await findEmailByEmailType(emailType);
+    // if (emails.length === 0) {
+    //   const templateInput = {
+    //     senderAddress: "Meta-Jobs",
+    //     subject: "Your Resume is Live",
+    //     message: "Congrats..!! Your Resume is published",
+    //     emailType: "RESUME_PUBLISHED",
+    //   };
+    //   await createEmail(templateInput);
+    //   emails = await findEmailByEmailType("RESUME_PUBLISHED");
+    // }
+    // const emailData = emails[0];
+    // const inputEmailData = {
+    //   userEmail: user.email,
+    //   emailData,
+    //   emailType,
+    //   userId,
+    // };
+    // const mailInfo = sendNotificationEmail(inputEmailData);
     return resume;
   } catch (e) {
     throw e;
@@ -233,6 +234,7 @@ export async function getResumePrivate(accessToken) {
   try {
     const user = await requireCandidate(accessToken);
     const userID = user == null ? void 0 : user.id;
+    console.log("user: ", userID);
     const adminRole = user.role.isAdmin;
     if (adminRole === true) {
       const resumes = await findAdminResumeService();
@@ -271,6 +273,7 @@ export async function deleteResume(reqQuery) {
   try {
     const user = await requireCandidate(reqQuery.accessToken);
     const userId = user._id;
+    console.log("reqQuery: ", reqQuery);
     const resumeId = reqQuery.resumeId;
     const resume = await deleteResumeService(resumeId);
     // const emailType = "RESUME_DELETED";
