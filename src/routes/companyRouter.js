@@ -4,9 +4,11 @@ import companyController from "../Controllers/companyController.js";
 const {
   createCampany,
   showCompanies,
-  singleCompany,
+  getSingleCompany,
   updateCompany,
   deleteCompany,
+  getCompaniesPrivate,
+  updateStatusCompany,
 } = companyController;
 const router = express.Router();
 //company routes
@@ -14,12 +16,16 @@ const router = express.Router();
 // /api/company/create
 router.post("/admin/company/create", createCampany);
 // /api/company/id
-router.get("/company/:id", singleCompany);
+router.get("/company/:id", getSingleCompany);
 // /api/company/update/company_id
-router.put("/admin/company/update/:id", updateCompany);
+router.put("/admin/company/:id/update", updateCompany);
 // /api/companies
 router.get("/companies", showCompanies);
+// /api/companies/private
+router.get("/companies/private", getCompaniesPrivate);
 // /api/company/delete/company_id
-router.delete("/admin/company/delete/:id", deleteCompany);
+router.delete("/admin/company/:id/delete", deleteCompany);
+// /api/company/delete/company_id
+router.put("/admin/companies/status/:id", updateStatusCompany);
 
 export default router;
