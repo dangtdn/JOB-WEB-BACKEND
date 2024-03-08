@@ -7,6 +7,7 @@ const {
   updateResume,
   deleteResume,
   getSingleResume,
+  updateStattusResume,
 } = ResumeController;
 const router = express.Router();
 //resumes routes
@@ -22,6 +23,9 @@ router.post("/resumes/create", createResume);
 
 // /api/resumes/:id/update
 router.put("/resumes/:id/update", updateResume);
+
+// /api//admin/resumes/status/:id
+router.put("/admin/resumes/status/:id", updateStattusResume);
 
 // /api/resumes/:id/delete
 router.delete("/resumes/:id/delete", deleteResume);

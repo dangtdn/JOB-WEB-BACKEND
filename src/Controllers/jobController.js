@@ -6,7 +6,11 @@ import {
   findEmailByEmailType,
 } from "../services/admin/emailService.js";
 import { sendNotificationEmail } from "../Middlewares/nodeMailer.js";
-import { deleteJobService, findAdminJob } from "../services/jobService.js";
+import {
+  deleteJobService,
+  findAdminJob,
+  jobstatusUpdate,
+} from "../services/jobService.js";
 
 const JobController = {
   //create job
@@ -189,6 +193,31 @@ const JobController = {
       });
     }
   },
+
+  //update status job by id.
+  updateStatusJob: async (req, res, next) => {
+    try {
+      const { id } = req.params;
+      const { headers } = req;
+      const accessToken = headers.authorization?.split(" ")[1];
+
+      const rewQuery = {
+        accessToken,
+        jobId: id,
+        jobStatus: req.body.status,
+      };
+      const message = await updateJobStatus(rewQuery);
+
+      res.status(200).send({
+        message,
+      });
+    } catch (error) {
+      res.status(500).send({
+        message: "Server Error",
+        error: error.message,
+      });
+    }
+  },
 };
 
 export default JobController;
@@ -265,6 +294,21 @@ export async function getJobsService() {
         "socialLink",
       ])
       .lean(true);
+  } catch (e) {
+    throw e;
+  }
+}
+// job status update
+export async function updateJobStatus(rewQuery) {
+  try {
+    const user = await requireUser(rewQuery.accessToken);
+    const query = {
+      userId: user._id,
+      adminRole: user.role.isAdmin,
+      jobId: rewQuery.jobId,
+      jobStatus: rewQuery.jobStatus,
+    };
+    const jobs = await jobstatusUpdate(query);
     return jobs;
   } catch (e) {
     throw e;

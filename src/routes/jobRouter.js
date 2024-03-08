@@ -1,8 +1,15 @@
 import express from "express";
 import jobController from "../Controllers/jobController.js";
 
-const { createJob, singleJob, updateJob, getJobs, deleteJobs, getJobsPrivate } =
-  jobController;
+const {
+  createJob,
+  singleJob,
+  updateJob,
+  getJobs,
+  deleteJobs,
+  getJobsPrivate,
+  updateStatusJob,
+} = jobController;
 
 const router = express.Router();
 //jobs routes
@@ -13,6 +20,8 @@ router.post("/admin/job/create", createJob);
 router.get("/jobs/:id", singleJob);
 // /api/job/update/job_id
 router.put("/admin/job/update/:id", updateJob);
+// /api//admin/jobs/status/:id
+router.put("/admin/jobs/status/:id", updateStatusJob);
 // /api/jobs
 router.get("/jobs", getJobs);
 // /api/jobs

@@ -91,6 +91,7 @@ const companyController = {
   //update company by id.
   updateCompany: async (req, res, next) => {
     try {
+      const { id } = req.params;
       const { headers } = req;
       const accessToken = headers.authorization?.split(" ")[1];
       const { files } = req;
@@ -220,6 +221,7 @@ const companyController = {
   //delete company
   updateStatusCompany: async (req, res, next) => {
     try {
+      const { id } = req.params;
       const { headers } = req;
       const accessToken = headers.authorization?.split(" ")[1];
       const rewQuery = {

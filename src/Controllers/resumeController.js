@@ -1,4 +1,4 @@
-import { requireCandidate } from "../Middlewares/auth.js";
+import { requireCandidate, requireUser } from "../Middlewares/auth.js";
 import {
   createEmail,
   findEmailByEmailType,
@@ -9,6 +9,7 @@ import {
   findAdminResumeService,
   findResumeService,
   getSingleResumeService,
+  resumeStatusUpdateService,
   updateResumeService,
 } from "../services/resumeService.js";
 
@@ -188,6 +189,30 @@ const ResumeController = {
       });
     }
   },
+  // update status resume
+  updateStattusResume: async (req, res, next) => {
+    try {
+      const { id } = req.params;
+      const { headers } = req;
+      const accessToken = headers.authorization?.split(" ")[1];
+
+      const rewQuery = {
+        accessToken,
+        resumeId: id,
+        resumeStatus: req.body.status,
+      };
+      const message = await updateResumeStatus(rewQuery);
+
+      res.status(200).send({
+        message,
+      });
+    } catch (e) {
+      res.status(500).send({
+        message: "Server error",
+        error: e.message,
+      });
+    }
+  },
 };
 
 export default ResumeController;
@@ -297,6 +322,22 @@ export async function deleteResume(reqQuery) {
     //     userId
     // };
     // const mailInfo = sendNotificationEmail(inputEmailData);
+    return resume;
+  } catch (e) {
+    throw e;
+  }
+}
+// resume status update
+export async function updateResumeStatus(rewQuery) {
+  try {
+    const user = await requireUser(rewQuery.accessToken);
+    const query = {
+      userId: user._id,
+      adminRole: user.role.isAdmin,
+      resumeId: rewQuery.resumeId,
+      resumeStatus: rewQuery.resumeStatus,
+    };
+    const resume = await resumeStatusUpdateService(query);
     return resume;
   } catch (e) {
     throw e;
