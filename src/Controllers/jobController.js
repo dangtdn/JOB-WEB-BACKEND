@@ -88,7 +88,7 @@ const JobController = {
       return res.status(200).send({
         message: "Successfully fetched job",
         success: true,
-        job,
+        data: job,
         relatedJobs: relatedJobs,
       });
     } catch (e) {
@@ -138,30 +138,9 @@ const JobController = {
   //get jobs.
   getJobs: async (req, res, next) => {
     try {
-      async function getJobsService() {
-        try {
-          // const jobs = await JobModel.find(arg).lean(true)
-          const jobs = await Job.find()
-            .populate("company", [
-              "companyName",
-              "companyTagline",
-              "logo",
-              "companyEmail",
-              "phoneNumber",
-              "companyWebsite",
-              "socialLink",
-            ])
-            .lean(true);
-          return jobs;
-        } catch (e) {
-          throw e;
-        }
-      }
-
       const jobs = await getJobsService();
-      res.status(200).json({
+      res.status(200).send({
         message: "Successfully fetched all jobs",
-        success: true,
         jobs,
       });
     } catch (e) {
@@ -292,6 +271,30 @@ export async function getJobsPrivate(accessToken) {
     }
     const jobs1 = await findJob(userID);
     return jobs1;
+  } catch (e) {
+    throw e;
+  }
+}
+// get all jobs public
+export async function getJobsService() {
+  try {
+    const jobs = await Job.find({
+      "status.isApproved": true,
+      "status.isPublished": true,
+      "status.isFeatured": true,
+      "status.isActive": true,
+    })
+      .populate("company", [
+        "companyName",
+        "companyTagline",
+        "logo",
+        "companyEmail",
+        "phoneNumber",
+        "companyWebsite",
+        "socialLink",
+      ])
+      .lean(true);
+    return jobs;
   } catch (e) {
     throw e;
   }
