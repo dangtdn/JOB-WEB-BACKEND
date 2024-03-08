@@ -1,16 +1,4 @@
-import { Job } from "../Models/JobModel.js";
-import Cloud from "../utils/cloudinary.js";
-import {
-  requireAdmin,
-  requireCandidate,
-  requireUser,
-} from "../Middlewares/auth.js";
-import {
-  createEmail,
-  findEmailByEmailType,
-} from "../services/admin/emailService.js";
-import { sendNotificationEmail } from "../Middlewares/nodeMailer.js";
-import { deleteJobService, findAdminJob } from "../services/jobService.js";
+import { requireCandidate } from "../Middlewares/auth.js";
 import {
   createJobAlertService,
   deleteJobAlertService,
@@ -48,7 +36,7 @@ const JobAlertsController = {
     try {
       const { headers } = req;
       const accessToken = headers.authorization?.split(" ")[1];
-
+      console.log("accessToken: ", accessToken);
       const jobAlerts = await getJobAlerts(accessToken);
 
       res.status(200).send({

@@ -88,7 +88,7 @@ const JobController = {
       return res.status(200).send({
         message: "Successfully fetched job",
         success: true,
-        job,
+        data: job,
         relatedJobs: relatedJobs,
       });
     } catch (e) {
@@ -139,7 +139,7 @@ const JobController = {
   getJobs: async (req, res, next) => {
     try {
       const jobs = await getJobsService();
-      res.status(200).json({
+      res.status(200).send({
         message: "Successfully fetched all jobs",
         jobs,
       });
@@ -294,6 +294,7 @@ export async function getJobsService() {
         "socialLink",
       ])
       .lean(true);
+    return jobs;
   } catch (e) {
     throw e;
   }
