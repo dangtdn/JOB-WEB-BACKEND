@@ -9,6 +9,7 @@ import { sendNotificationEmail } from "../Middlewares/nodeMailer.js";
 import {
   deleteJobService,
   findAdminJob,
+  getTotalCountService,
   jobstatusUpdate,
 } from "../services/jobService.js";
 
@@ -99,6 +100,23 @@ const JobController = {
     }
   },
 
+  //find total job, resume, company
+  getTotalCount: async (req, res, next) => {
+    try {
+      const countData = await getTotalCount();
+
+      res.status(200).send({
+        message: "Successfully found total count for jobs, resume, company",
+        data: countData,
+      });
+    } catch (e) {
+      res.status(500).send({
+        message: "Server error",
+        error: e.message,
+      });
+    }
+  },
+
   //update job by id.
   updateJob: async (req, res, next) => {
     try {
@@ -135,10 +153,40 @@ const JobController = {
     }
   },
 
-  //get jobs.
+  //get jobs with featured
   getJobs: async (req, res, next) => {
     try {
       const jobs = await getJobsService();
+      res.status(200).send({
+        message: "Successfully fetched all featured jobs",
+        jobs,
+      });
+    } catch (e) {
+      res.status(500).send({
+        message: "Server error",
+        error: e.message,
+      });
+    }
+  },
+
+  //get jobs.
+  getSearchJobs: async (req, res, next) => {
+    try {
+      const jobs = await Job.find({
+        "status.isApproved": true,
+        "status.isPublished": true,
+        "status.isActive": true,
+      })
+        .populate("company", [
+          "companyName",
+          "companyTagline",
+          "logo",
+          "companyEmail",
+          "phoneNumber",
+          "companyWebsite",
+          "socialLink",
+        ])
+        .lean(true);
       res.status(200).send({
         message: "Successfully fetched all jobs",
         jobs,
@@ -311,6 +359,15 @@ export async function updateJobStatus(rewQuery) {
     };
     const jobs = await jobstatusUpdate(query);
     return jobs;
+  } catch (e) {
+    throw e;
+  }
+}
+// find total job, resume, company
+export async function getTotalCount(req, res) {
+  try {
+    const totalCount = await getTotalCountService();
+    return totalCount;
   } catch (e) {
     throw e;
   }

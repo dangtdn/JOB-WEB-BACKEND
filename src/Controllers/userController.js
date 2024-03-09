@@ -1,7 +1,12 @@
 import { requireUser } from "../Middlewares/auth.js";
+import { userPasswordValidate } from "../Middlewares/validateUser.js";
 import { User } from "../Models/UserModel.js";
 import { getDashboardStat } from "../services/dashboardService.js";
-import { getUserService, updateUserService } from "../services/userService.js";
+import {
+  getUserService,
+  updatePasswordService,
+  updateUserService,
+} from "../services/userService.js";
 import ErrorResponse from "../utils/errorResponse.js";
 import jwt from "jsonwebtoken";
 
@@ -27,7 +32,6 @@ const userController = {
         pages: Math.ceil(count / pageSize),
         count,
       });
-      next();
     } catch (e) {
       res.status(500).send({
         message: "Server Error",
@@ -128,7 +132,6 @@ const userController = {
         success: true,
         currentUser,
       });
-      next();
     } catch (e) {
       res.status(500).send({
         message: "Server Error",
@@ -152,11 +155,37 @@ const userController = {
         message: "Successfully fetched user dashboard statistics",
         data,
       });
-      next();
     } catch (error) {
       res.status(500).send({
         message: "Server Error",
         error: error.message,
+      });
+    }
+  },
+
+  // reset password
+  updatePassword: async (req, res, next) => {
+    try {
+      const { headers } = req;
+      const accessToken = headers.authorization?.split(" ")[1];
+
+      const userInput = {
+        currentPassword: req.body.currentPassword,
+        newPassword: req.body.newPassword,
+      };
+      const reqQuery = {
+        accessToken,
+        userInput,
+      };
+      const userPassword = await updatePassword(reqQuery);
+
+      res.status(200).send({
+        message: "Successfully reset password",
+      });
+    } catch (e) {
+      res.status(500).send({
+        message: "Server error",
+        error: e.message,
       });
     }
   },
@@ -185,6 +214,48 @@ export async function getUser(accessToken) {
     const userID = userInfo._id;
     const user = await getUserService(userID);
     return user;
+  } catch (e) {
+    throw e;
+  }
+}
+// reset password Handler
+export async function updatePassword(reqQuery) {
+  try {
+    const { accessToken, userInput } = reqQuery;
+    const userInfo = await requireUser(accessToken);
+    const userId = userInfo._id;
+    const userEmail = userInfo.email;
+    const userDetails = {
+      password: userInput.currentPassword,
+      email: userEmail,
+    };
+    const user = await userPasswordValidate(userDetails);
+    if (!user) {
+      throw new Error("Invalid current password");
+    }
+    const userPassword = await updatePasswordService(userId, userInput);
+    // const emailType = "RESET_PASSWORD";
+    // let emails;
+    // emails = await findEmailByEmailType(emailType);
+    // if (emails.length === 0) {
+    //     const templateInput = {
+    //         senderAddress: "Meta-Jobs",
+    //         subject: "Request to reset password",
+    //         message: "You have changed your password",
+    //         emailType: "RESET_PASSWORD"
+    //     };
+    //     await createEmail(templateInput);
+    //     emails = await findEmailByEmailType("RESET_PASSWORD");
+    // }
+    // const emailData = emails[0];
+    // const inputEmailData = {
+    //     userEmail: userEmail,
+    //     emailData,
+    //     userId,
+    //     emailType
+    // };
+    // const mailInfo = sendNotificationEmail(inputEmailData);
+    return userPassword;
   } catch (e) {
     throw e;
   }

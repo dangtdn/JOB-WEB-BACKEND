@@ -9,6 +9,8 @@ const {
   deleteJobs,
   getJobsPrivate,
   updateStatusJob,
+  getSearchJobs,
+  getTotalCount,
 } = jobController;
 
 const router = express.Router();
@@ -24,6 +26,10 @@ router.put("/admin/job/update/:id", updateJob);
 router.put("/admin/jobs/status/:id", updateStatusJob);
 // /api/jobs
 router.get("/jobs", getJobs);
+// /api/jobs/search
+router.get("/jobs-search", getSearchJobs);
+// /api/jobs-count
+router.get("/jobs-count", getTotalCount);
 // /api/jobs
 router.get("/admin/jobs/private", getJobsPrivate);
 // /api/jobs

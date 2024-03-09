@@ -8,6 +8,7 @@ const {
   deleteUser,
   createUserJobsHistory,
   getDashboardStat,
+  updatePassword,
 } = userController;
 const router = express.Router();
 
@@ -20,6 +21,8 @@ router.get("/current-user", singleUser);
 router.get("/statistics", getDashboardStat);
 // /api/user/update/id
 router.put("/admin/user/update/:id", updateUser);
+// /api/user/update/id
+router.put("/users/password/reset", updatePassword);
 // /api/admin/user/delete/id
 router.delete("/admin/user/delete/:id", deleteUser);
 // /api/user/jobhistory

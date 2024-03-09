@@ -105,8 +105,6 @@ const ResumeController = {
       });
     }
   },
-  // resume status update
-  updateResumeStatus: async (req, res, next) => {},
   //   // update resume image and file controller
   updateResume: async (req, res, next) => {
     try {

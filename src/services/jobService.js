@@ -1,4 +1,6 @@
+import { Company } from "../Models/CompanyModel.js";
 import { Job } from "../Models/JobModel.js";
+import ResumeModel from "../Models/ResumeModel.js";
 
 // delete a job service
 export async function deleteJobService(jobID) {
@@ -96,13 +98,13 @@ export async function jobstatusUpdate(query) {
           // await sendNotificationEmail(rejectlInput);
           return "Job rejected by Admin";
         case "featured":
-          const user = await getUserWithPackage(userId);
-          const { featuredJobs } = user == null ? void 0 : user.package;
-          // find the user total job
-          const featuredJobsCount = await findTotalFeaturedJob(userId);
-          if (featuredJobsCount >= featuredJobs) {
-            throw new Error("You have reached your job limit");
-          }
+          // const user = await getUserWithPackage(userId);
+          // const { featuredJobs } = user == null ? void 0 : user.package;
+          // // find the user total job
+          // const featuredJobsCount = await findTotalFeaturedJob(userId);
+          // if (featuredJobsCount >= featuredJobs) {
+          //   throw new Error("You have reached your job limit");
+          // }
           job.status.isFeatured = true;
           job.save();
           // let featureJobResult;
@@ -253,14 +255,14 @@ export async function jobstatusUpdate(query) {
     }
     switch (jobStatus) {
       case "featured":
-        const user1 = await getUserWithPackage(userId);
-        const { featuredJobs: featuredJobs1 } =
-          user1 == null ? void 0 : user1.package;
-        // find the user total job
-        const featuredJobsCount1 = await findTotalFeaturedJob(userId);
-        if (featuredJobsCount1 >= featuredJobs1) {
-          throw new Error("You have reached your job limit");
-        }
+        // const user1 = await getUserWithPackage(userId);
+        // const { featuredJobs: featuredJobs1 } =
+        //   user1 == null ? void 0 : user1.package;
+        // // find the user total job
+        // const featuredJobsCount1 = await findTotalFeaturedJob(userId);
+        // if (featuredJobsCount1 >= featuredJobs1) {
+        //   throw new Error("You have reached your job limit");
+        // }
         job.status.isFeatured = true;
         job.save();
         // let featureJobResult1;
@@ -360,6 +362,34 @@ export async function jobstatusUpdate(query) {
       default:
         throw new Error("Invalid status");
     }
+  } catch (e) {
+    throw e;
+  }
+}
+// find total job, total company, total resume in public api route
+export async function getTotalCountService() {
+  try {
+    const totalJobs = await Job.find({
+      "status.isApproved": true,
+      "status.isPublished": true,
+      "status.isActive": true,
+    }).count();
+    const totalCompanies = await Company.find({
+      "status.isPublished": true,
+      "status.isApproved": true,
+      "status.isActive": true,
+    }).count();
+    const totalResumes = await ResumeModel.find({
+      "status.isPublished": true,
+      "status.isApproved": true,
+      "status.isActive": true,
+    }).count();
+    const total = {
+      totalJobs,
+      totalCompanies,
+      totalResumes,
+    };
+    return total;
   } catch (e) {
     throw e;
   }
