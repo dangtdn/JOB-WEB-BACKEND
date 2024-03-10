@@ -12,7 +12,6 @@ export async function loginUserService(input) {
       email,
       password,
     });
-    console.log("input: ", input);
     if (!user) {
       throw new Error("Invalid Authentication");
     }

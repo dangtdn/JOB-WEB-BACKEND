@@ -19,10 +19,13 @@ export const userPasswordValidate = async ({ email, password }) => {
     const user = await getUserByQueryService({
       email,
     });
-    if (!user) return false;
+    if (!user) {
+      throw new Error("Incorrect email!");
+    }
     const isMatch = await bcrypt.compare(password, user.password);
-    console.log("isMatch: ", isMatch);
-    if (!isMatch) return false;
+    if (!isMatch) {
+      throw new Error("Incorrect password!");
+    }
     return user;
   } catch (e) {
     throw e;

@@ -53,9 +53,9 @@ const resumeSchema = new mongoose.Schema(
     category: {
       type: String,
     },
-    industry: {
-      type: String,
-    },
+    // industry: {
+    //   type: String,
+    // },
     workingRate: {
       type: Number,
     },

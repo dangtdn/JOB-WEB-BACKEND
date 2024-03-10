@@ -40,7 +40,7 @@ const authController = {
         });
     } catch (e) {
       res.status(500).send({
-        message: "Server Error",
+        message: e.message,
         error: e.message,
       });
     }
