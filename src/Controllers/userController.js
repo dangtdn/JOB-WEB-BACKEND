@@ -63,8 +63,9 @@ const userController = {
     try {
       const { headers } = req;
       const accessToken = headers.authorization?.split(" ")[1];
-      const { file } = req;
-      const imageData = file?.path;
+      const { files } = req;
+      const imageData = files?.profileImage?.path;
+      console.log("imageData: ", imageData);
       const userData = {
         fullName: {
           firstName: req.body.firstName,
@@ -184,7 +185,7 @@ const userController = {
       });
     } catch (e) {
       res.status(500).send({
-        message: "Server error",
+        message: e.message,
         error: e.message,
       });
     }
@@ -234,27 +235,6 @@ export async function updatePassword(reqQuery) {
       throw new Error("Invalid current password");
     }
     const userPassword = await updatePasswordService(userId, userInput);
-    // const emailType = "RESET_PASSWORD";
-    // let emails;
-    // emails = await findEmailByEmailType(emailType);
-    // if (emails.length === 0) {
-    //     const templateInput = {
-    //         senderAddress: "Meta-Jobs",
-    //         subject: "Request to reset password",
-    //         message: "You have changed your password",
-    //         emailType: "RESET_PASSWORD"
-    //     };
-    //     await createEmail(templateInput);
-    //     emails = await findEmailByEmailType("RESET_PASSWORD");
-    // }
-    // const emailData = emails[0];
-    // const inputEmailData = {
-    //     userEmail: userEmail,
-    //     emailData,
-    //     userId,
-    //     emailType
-    // };
-    // const mailInfo = sendNotificationEmail(inputEmailData);
     return userPassword;
   } catch (e) {
     throw e;
