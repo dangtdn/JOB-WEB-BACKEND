@@ -93,11 +93,34 @@ const JobApplyController = {
       });
     }
   },
+
+  //delete job apply
+  deleteUserApplication: async (req, res, next) => {
+    try {
+      const { id } = req.params;
+      const { headers } = req;
+      const accessToken = headers.authorization?.split(" ")[1];
+      const reqQuery = {
+        accessToken,
+        applicatioId: id,
+      };
+      const application = await deleteUserApplication(reqQuery);
+
+      res.status(200).send({
+        message: "Successfully deleted application",
+      });
+    } catch (e) {
+      res.status(500).send({
+        message: "Server Error",
+        error: e.message,
+      });
+    }
+  },
 };
 
 export default JobApplyController;
 
-// create reate job handller
+// create job handller
 export async function createJobApply(reqQuery) {
   try {
     const { accessToken, applyData, cvFile } = reqQuery;
@@ -130,6 +153,21 @@ export async function createJobApply(reqQuery) {
     // };
     // await sendNotificationEmail(approvalInput);
     return jobApply;
+  } catch (e) {
+    throw e;
+  }
+}
+
+// delete job apply
+export async function deleteUserApplication(reqQuery) {
+  try {
+    await requireCandidate(reqQuery.accessToken);
+    const applicatioId = reqQuery.applicatioId;
+    const application = await JobApply.findByIdAndDelete(applicatioId);
+    if (!application) {
+      throw new Error("Application Not Found");
+    }
+    return application;
   } catch (e) {
     throw e;
   }

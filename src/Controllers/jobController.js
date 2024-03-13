@@ -9,6 +9,7 @@ import { sendNotificationEmail } from "../Middlewares/nodeMailer.js";
 import {
   deleteJobService,
   findAdminJob,
+  findJob,
   getTotalCountService,
   jobstatusUpdate,
 } from "../services/jobService.js";
@@ -310,7 +311,7 @@ export async function deleteJob(reqQuery) {
 export async function getJobsPrivate(accessToken) {
   try {
     const user = await requireUser(accessToken);
-    const userID = user == null ? void 0 : user.id;
+    const userID = user == null ? void 0 : user._id;
     console.log("userID: ", userID);
     const adminRole = user.role.isAdmin;
     if (adminRole === true) {

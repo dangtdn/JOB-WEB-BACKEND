@@ -6,6 +6,7 @@ const {
   getUserApplication,
   getJobApplication,
   updateApplyStatus,
+  deleteUserApplication,
 } = JobApplyController;
 const router = express.Router();
 //job-apply routes
@@ -18,5 +19,7 @@ router.get("/users/:id/job-apply", getUserApplication);
 router.get("/jobs/:id/job-apply", getJobApplication);
 // /api/job-apply/:id/update
 router.put("/job-apply/:id/update", updateApplyStatus);
+// /api/job-apply/:id/update
+router.delete("/users/:id/delete", deleteUserApplication);
 
 export default router;
