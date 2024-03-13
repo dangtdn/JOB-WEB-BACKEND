@@ -1,4 +1,5 @@
 import { sendSingleEmail } from "../../Middlewares/nodeMailerSingle.js";
+import EmailModel from "../../Models/admin/emailModel.js";
 
 export async function sendContactEmail(input) {
   try {

@@ -1,3 +1,4 @@
+import { Formidable } from "formidable";
 import { requireUser } from "../Middlewares/auth.js";
 import { userPasswordValidate } from "../Middlewares/validateUser.js";
 import { User } from "../Models/UserModel.js";
@@ -63,8 +64,21 @@ const userController = {
     try {
       const { headers } = req;
       const accessToken = headers.authorization?.split(" ")[1];
-      const { files } = req;
-      const imageData = files?.profileImage?.path;
+
+      // get body from request
+      const data = await new Promise((resolve, reject) => {
+        const form = new Formidable();
+
+        form.parse(req, (err, fields, files) => {
+          if (err) reject({ err });
+          resolve({ err, fields, files });
+        });
+      });
+
+      const imageData = data?.files?.profileImage
+        ? data?.files?.profileImage[0].filepath
+        : null;
+
       console.log("imageData: ", imageData);
       const userData = {
         fullName: {

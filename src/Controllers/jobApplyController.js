@@ -7,6 +7,7 @@ import {
   findApplications,
   getJobApplicationsService,
 } from "../services/jobApplyService.js";
+import { emails } from "../utils/mongodb collections/emails.js";
 
 const JobApplyController = {
   // create JobApply
@@ -132,26 +133,26 @@ export async function createJobApply(reqQuery) {
       user: userId,
     };
     const jobApply = await createJobApplyService(applyDataInput, cvFile);
-    // let emails;
+    let emails = emails.filter((item) => item.emailType === "JOB_APPLIED");
     // emails = await findEmailByEmailType("JOB_APPLIED");
-    // if (emails.length === 0) {
-    //   const templateInput = {
-    //     senderAddress: "Meta Jobs",
-    //     subject: "Job is Applied",
-    //     message: "Congrats..!! Your have applied a Job",
-    //     emailType: "JOB_APPLIED",
-    //   };
-    //   await createEmail(templateInput);
-    //   emails = await findEmailByEmailType("JOB_APPLIED");
-    // }
-    // const emailData = emails[0];
-    // const approvalInput = {
-    //   userEmail: userEmail,
-    //   emailData,
-    //   userId,
-    //   emailType: "JOB_APPLIED",
-    // };
-    // await sendNotificationEmail(approvalInput);
+    if (emails.length === 0) {
+      const templateInput = {
+        senderAddress: "Meta Jobs",
+        subject: "Job is Applied",
+        message: "Congrats..!! Your have applied a Job",
+        emailType: "JOB_APPLIED",
+      };
+      await createEmail(templateInput);
+      emails = await findEmailByEmailType("JOB_APPLIED");
+    }
+    const emailData = emails[0];
+    const approvalInput = {
+      userEmail: userEmail,
+      emailData,
+      userId,
+      emailType: "JOB_APPLIED",
+    };
+    await sendNotificationEmail(approvalInput);
     return jobApply;
   } catch (e) {
     throw e;

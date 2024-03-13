@@ -7,11 +7,13 @@ import resumeRouter from "./resumeRouter.js";
 import companyRouter from "./companyRouter.js";
 import jobAlertRouter from "./jobAlertRouter.js";
 import bookmarkRouter from "./bookmarkRouter.js";
+import notificationsRouter from "./notificationsRouter.js";
 import ErrorResponse from "../utils/errorResponse.js";
+import upload from "../utils/multer.js";
 
 const route = (app) => {
   app.use("/api", authRouter);
-  app.use("/api", userRouter);
+  app.use("/api", userRouter.use(upload.single("file")));
   app.use("/api", categoryRouter);
   app.use("/api", jobRouter);
   app.use("/api", companyRouter);
@@ -19,6 +21,7 @@ const route = (app) => {
   app.use("/api", resumeRouter);
   app.use("/api", jobAlertRouter);
   app.use("/api", bookmarkRouter);
+  app.use("/api", notificationsRouter);
 
   app.get("/", (req, res) => res.send("Job Portal - API"));
 
