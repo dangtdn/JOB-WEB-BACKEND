@@ -1,6 +1,7 @@
 import { Company } from "../Models/CompanyModel.js";
 import { Job } from "../Models/JobModel.js";
 import ResumeModel from "../Models/ResumeModel.js";
+import { ObjectId } from "mongodb";
 
 // delete a job service
 export async function deleteJobService(jobID) {
@@ -29,6 +30,31 @@ export async function findAdminJob() {
           localField: "_id",
           foreignField: "jobItem",
           as: "applications",
+        },
+      },
+    ]);
+    return jobs;
+  } catch (e) {
+    throw e;
+  }
+}
+
+// find all private job service
+export async function findJob(query) {
+  try {
+    // find all jobs and count application from applies collection using aggregation
+    const jobs = await Job.aggregate([
+      {
+        $lookup: {
+          from: "jobapplies",
+          localField: "_id",
+          foreignField: "jobItem",
+          as: "applications",
+        },
+      },
+      {
+        $match: {
+          user: query,
         },
       },
     ]);
