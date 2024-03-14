@@ -1,6 +1,7 @@
 import { Job } from "../Models/JobModel.js";
 import ResumeModel from "../Models/ResumeModel.js";
 import { User } from "../Models/UserModel.js";
+import { findBookmarks } from "./bookmarkService.js";
 import { countPubishedCompany } from "./companyService.js";
 import { countApplications } from "./jobApplyService.js";
 
@@ -55,9 +56,9 @@ export async function getDashboardStat(user) {
     });
     const appliedJobCount = await countApplications(query);
     const publishedCompanyCount = await countPubishedCompany();
-    // const bookmarkData = await findBookmarks(userID);
-    // const bookmarkCount =
-    //   ((ref = bookmarkData[0]) == null ? void 0 : ref.bookmarks.length) || 0;
+    const bookmarkData = await findBookmarks(userID);
+    const bookmarkCount =
+      ((ref = bookmarkData[0]) == null ? void 0 : ref.bookmarks.length) || 0;
     // response based on user role
     if (user.role.isAdmin) {
       return [
@@ -65,10 +66,10 @@ export async function getDashboardStat(user) {
           title: "Total Jobs",
           count: totalPublishedJobCount,
         },
-        {
-          title: "Total Resumes",
-          count: totalPublishedResumeCount,
-        },
+        // {
+        //   title: "Total Resumes",
+        //   count: totalPublishedResumeCount,
+        // },
         {
           title: "Total Employees",
           count: totalEmployerCount,
@@ -85,32 +86,24 @@ export async function getDashboardStat(user) {
           count: totalJobCount,
         },
         {
-          title: "Featured Jobs",
-          count: featuredJobCount,
-        },
-        {
           title: "Approved Jobs",
           count: approvedJobCount,
         },
-        // {
-        //   title: "Bookmarked",
-        //   count: bookmarkCount,
-        // },
+        {
+          title: "Bookmarked",
+          count: bookmarkCount,
+        },
       ];
     } else if (user.role.isCandidate) {
       return [
-        {
-          title: "Total Resumes",
-          count: totalResumeCount,
-        },
-        {
-          title: "Approved Resumes",
-          count: approvedResumeCount,
-        },
         // {
-        //   title: "Bookmarked",
-        //   count: bookmarkCount,
+        //   title: "Total Resumes",
+        //   count: totalResumeCount,
         // },
+        {
+          title: "Bookmarked",
+          count: bookmarkCount,
+        },
         {
           title: "Applied Jobs",
           count: appliedJobCount,
