@@ -7,12 +7,15 @@ const {
   getJobApplication,
   updateApplyStatus,
   deleteUserApplication,
+  getApplications,
 } = JobApplyController;
 const router = express.Router();
 //job-apply routes
 
 // /api/job-apply/create
 router.post("/job-apply/create", createJobApply);
+// /api/applications
+router.get("/applications", getApplications);
 // /api/users/:id/job-apply
 router.get("/users/:id/job-apply", getUserApplication);
 // /api/jobs/:id/job-apply

@@ -205,7 +205,7 @@ const JobController = {
     try {
       const { headers } = req;
       const accessToken = headers.authorization?.split(" ")[1];
-      console.log("accessToken: ", headers.authorization);
+      
       const jobs = await getJobsPrivate(accessToken);
       res.status(200).send({
         message: "Successfully fetched all private jobs",

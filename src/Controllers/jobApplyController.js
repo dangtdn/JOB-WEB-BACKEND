@@ -1,4 +1,4 @@
-import { requireCandidate } from "../Middlewares/auth.js";
+import { requireCandidate, requireUser } from "../Middlewares/auth.js";
 import { sendNotificationEmail } from "../Middlewares/nodeMailer.js";
 import JobApply from "../Models/JobApplyModel.js";
 import { findEmailByEmailType } from "../services/admin/emailService.js";
@@ -13,6 +13,7 @@ const JobApplyController = {
   // create JobApply
   createJobApply: async (req, res, next) => {
     try {
+      console.log("accessToken: ", req.body);
       const { file } = req;
       const cvFile = file?.path;
       const { headers } = req;
@@ -65,6 +66,26 @@ const JobApplyController = {
       res.status(200).json({
         message: "Successfully find all applications of this job",
         data,
+      });
+    } catch (e) {
+      res.status(500).send({
+        message: "Server Error",
+        error: e.message,
+      });
+    }
+  },
+
+  // get all apply
+  getApplications: async (req, res, next) => {
+    try {
+      const { headers } = req;
+      const accessToken = headers.authorization?.split(" ")[1];
+
+      await requireUser(accessToken);
+      const applications = await JobApply.find().lean(true);
+      res.status(200).json({
+        message: "Successfully find all applications",
+        data: applications,
       });
     } catch (e) {
       res.status(500).send({
@@ -127,25 +148,25 @@ export async function createJobApply(reqQuery) {
     const { accessToken, applyData, cvFile } = reqQuery;
     const user = await requireCandidate(accessToken);
     const userId = user._id;
-    // const userEmail = user.email;
+    const userEmail = user.email;
     const applyDataInput = {
       ...applyData,
       user: userId,
     };
     const jobApply = await createJobApplyService(applyDataInput, cvFile);
-    let emails = emails.filter((item) => item.emailType === "JOB_APPLIED");
+    let applyEmails = emails.filter((item) => item.emailType === "JOB_APPLIED");
     // emails = await findEmailByEmailType("JOB_APPLIED");
-    if (emails.length === 0) {
-      const templateInput = {
-        senderAddress: "Meta Jobs",
-        subject: "Job is Applied",
-        message: "Congrats..!! Your have applied a Job",
-        emailType: "JOB_APPLIED",
-      };
-      await createEmail(templateInput);
-      emails = await findEmailByEmailType("JOB_APPLIED");
-    }
-    const emailData = emails[0];
+    // if (emails.length === 0) {
+    // const templateInput = {
+    //   senderAddress: "Meta Jobs",
+    //   subject: "Job is Applied",
+    //   message: "Congrats..!! Your have applied a Job",
+    //   emailType: "JOB_APPLIED",
+    // };
+    // await createEmail(templateInput);
+    // emails = await findEmailByEmailType("JOB_APPLIED");
+    // }
+    const emailData = applyEmails[0];
     const approvalInput = {
       userEmail: userEmail,
       emailData,

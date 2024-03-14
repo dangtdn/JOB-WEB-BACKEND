@@ -13,7 +13,7 @@ import upload from "../utils/multer.js";
 
 const route = (app) => {
   app.use("/api", authRouter);
-  app.use("/api", userRouter.use(upload.single("file")));
+  app.use("/api", userRouter);
   app.use("/api", categoryRouter);
   app.use("/api", jobRouter);
   app.use("/api", companyRouter);
