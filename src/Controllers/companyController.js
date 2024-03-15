@@ -96,16 +96,16 @@ const companyController = {
       const accessToken = headers.authorization?.split(" ")[1];
       const { files } = req;
       const inputFiles = files;
-      let logo = "";
+      let logoImage = "";
       let headerImage = "";
-      if (inputFiles.logo) {
-        logo = inputFiles.logo[0]?.path;
+      if (inputFiles.logoImage) {
+        logoImage = inputFiles.logoImage[0]?.path;
       }
       if (inputFiles.headerImage) {
         headerImage = inputFiles.headerImage[0]?.path;
       }
       const images = {
-        logo,
+        logoImage,
         headerImage,
       };
       const companyInput = {

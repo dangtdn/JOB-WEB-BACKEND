@@ -1,6 +1,32 @@
 import CategoryModel from "../Models/CategoryModel.js";
 import { Job } from "../Models/JobModel.js";
+import Cloud from "../utils/cloudinary.js";
 
+// create a category service
+export async function createCategoryService(categoryData, imagePath) {
+  try {
+    let categoryInput;
+    if (imagePath) {
+      // Upload image to cloudinary
+      const imageData = await Cloud.uploader.upload(imagePath);
+      categoryInput = {
+        ...categoryData,
+        avatar: imageData.secure_url,
+        iconUrl: imageData.public_id,
+      };
+    } else {
+      categoryInput = {
+        ...categoryData,
+      };
+    }
+    // console.log('CategoryInput from servoce', categoryInput)
+    const category = await CategoryModel.create(categoryInput);
+    return category;
+  } catch (e) {
+    //console.log(e)
+    throw e.code;
+  }
+}
 export async function getCategories() {
   try {
     const categories = await CategoryModel.find().lean(true);

@@ -12,14 +12,4 @@ Cloud.config({
   api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
-// const storage = new CloudinaryStorage({
-//   cloudinary: newCloudinary,
-//   allowedFormats: ["jpg", "png"],
-//   filename: function (req, file, cb) {
-//     cb(null, file.originalname);
-//   },
-// });
-
-// const Cloud = multer({ storage });
-
 export default Cloud;

@@ -65,20 +65,10 @@ const userController = {
       const { headers } = req;
       const accessToken = headers.authorization?.split(" ")[1];
 
-      // get body from request
-      const data = await new Promise((resolve, reject) => {
-        const form = new Formidable();
+      const { file } = req;
+      const imageData = file?.path;
 
-        form.parse(req, (err, fields, files) => {
-          if (err) reject({ err });
-          resolve({ err, fields, files });
-        });
-      });
-
-      const imageData = data?.files?.profileImage
-        ? data?.files?.profileImage[0].filepath
-        : null;
-
+      console.log(("req: ", req));
       console.log("imageData: ", imageData);
       const userData = {
         fullName: {

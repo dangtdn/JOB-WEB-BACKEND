@@ -20,9 +20,9 @@ export async function createCompanyService(input, images) {
     if (images) {
       let logoImageInput = null;
       let headerImageInput = null;
-      if (images.logo) {
+      if (images.logoImage) {
         // Upload image to cloudinary
-        const logoImageData = await Cloud.uploader.upload(images.logo);
+        const logoImageData = await Cloud.uploader.upload(images.logoImage);
         logoImageInput = {
           logo: logoImageData == null ? void 0 : logoImageData.secure_url,
           logoCloudinary_id:
@@ -61,12 +61,12 @@ export async function updateCompanyService(companyID, update, images) {
     if (images) {
       let logoImageInput = null;
       let headerImageInput = null;
-      if (images.logo) {
+      if (images.logoImage) {
         const companyPrevData = await Company.findById(companyID);
         if (companyPrevData.logoCloudinary_id) {
           await Cloud.uploader.destroy(companyPrevData.logoCloudinary_id);
         }
-        const logoImageData = await Cloud.uploader.upload(images.logo);
+        const logoImageData = await Cloud.uploader.upload(images.logoImage);
         logoImageInput = {
           logo: logoImageData == null ? void 0 : logoImageData.secure_url,
           logoCloudinary_id:
