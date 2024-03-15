@@ -1,4 +1,4 @@
-import { requireCandidate } from "../Middlewares/auth.js";
+import { requireUser } from "../Middlewares/auth.js";
 import {
   createJobAlertService,
   deleteJobAlertService,
@@ -158,7 +158,7 @@ export default JobAlertsController;
 // create job alert
 export async function createJobAlerts(reqData) {
   try {
-    const user = await requireCandidate(reqData.accessToken);
+    const user = await requireUser(reqData.accessToken);
     const userID = user == null ? void 0 : user.id;
     const input = {
       ...reqData.body,
@@ -173,7 +173,7 @@ export async function createJobAlerts(reqData) {
 // find job alert of a candidate (private)
 export async function getJobAlerts(accessToken) {
   try {
-    const user = await requireCandidate(accessToken);
+    const user = await requireUser(accessToken);
     const userID = user == null ? void 0 : user.id;
     const jobAlerts = await getJobAlertsService({
       user: userID,
@@ -186,7 +186,7 @@ export async function getJobAlerts(accessToken) {
 // get job alert by ID
 export async function getSingleJobAlert(reqData) {
   try {
-    const user = await requireCandidate(reqData.accessToken);
+    const user = await requireUser(reqData.accessToken);
     const alertID = reqData == null ? void 0 : reqData.alertId;
     const jobAlerts = await getSingleJobAlertService(alertID);
     return jobAlerts;
@@ -197,7 +197,7 @@ export async function getSingleJobAlert(reqData) {
 // update job alert
 export async function updateJobAlert(reqQuery) {
   try {
-    await requireCandidate(reqQuery.accessToken);
+    await requireUser(reqQuery.accessToken);
     const alertID = reqQuery.alertId;
     const alertData = {
       ...reqQuery.body,
@@ -215,7 +215,7 @@ export async function updateJobAlert(reqQuery) {
 // update job alert status
 export async function updateJobAlertStatus(reqQuery) {
   try {
-    await requireCandidate(reqQuery.accessToken);
+    await requireUser(reqQuery.accessToken);
     const alertID = reqQuery.alertId;
     const alertData = {
       active: reqQuery.active,
@@ -233,7 +233,7 @@ export async function updateJobAlertStatus(reqQuery) {
 // delete job alert
 export async function deleteJobAlert(reqQuery) {
   try {
-    await requireCandidate(reqQuery.accessToken);
+    await requireUser(reqQuery.accessToken);
     const alertID = reqQuery.alertId;
     const jobAlert = await deleteJobAlertService(alertID);
     return jobAlert;
