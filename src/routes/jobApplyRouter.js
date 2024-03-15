@@ -1,5 +1,6 @@
 import express from "express";
 import JobApplyController from "../Controllers/jobApplyController.js";
+import upload from "../utils/multer.js";
 
 const {
   createJobApply,
@@ -13,7 +14,7 @@ const router = express.Router();
 //job-apply routes
 
 // /api/job-apply/create
-router.post("/job-apply/create", createJobApply);
+router.post("/job-apply/create", upload.single("cvFile"), createJobApply);
 // /api/applications
 router.get("/applications", getApplications);
 // /api/users/:id/job-apply

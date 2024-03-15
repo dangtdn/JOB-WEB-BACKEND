@@ -4,10 +4,9 @@ import dotenv from "dotenv";
 import cors from "cors";
 import morgan from "morgan";
 import errorHandler from "./src/Middlewares/error.js";
-import cookieParser from "cookie-parser"
+import cookieParser from "cookie-parser";
 import route from "./src/routes/index.js";
 import database from "./src/utils/database.js";
-import fileUpload from "express-fileupload";
 
 dotenv.config();
 
@@ -27,7 +26,6 @@ app.use(
 );
 app.use(cookieParser());
 app.use(cors());
-app.use(fileUpload());
 
 //ROUTES MIDDLEWARE
 route(app);

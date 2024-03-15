@@ -2,6 +2,7 @@ import express from "express";
 import userController from "../Controllers/userController.js";
 import multer from "multer";
 import Cloud from "../utils/cloudinary.js";
+import upload from "../utils/multer.js";
 
 const {
   allUsers,
@@ -22,7 +23,7 @@ router.get("/current-user", singleUser);
 // /api/user/statistics
 router.get("/statistics", getDashboardStat);
 // /api/user/update/id
-router.put("/admin/user/update/:id", updateUser);
+router.put("/admin/user/update/:id", upload.single("profileImage"), updateUser);
 // /api/user/update/id
 router.put("/users/password/reset", updatePassword);
 // /api/admin/user/delete/id
