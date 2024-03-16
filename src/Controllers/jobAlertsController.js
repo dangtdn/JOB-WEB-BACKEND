@@ -1,4 +1,5 @@
 import { requireUser } from "../Middlewares/auth.js";
+import JobAlertModel from "../Models/JobAlertModel.js";
 import {
   createJobAlertService,
   deleteJobAlertService,
@@ -36,7 +37,7 @@ const JobAlertsController = {
     try {
       const { headers } = req;
       const accessToken = headers.authorization?.split(" ")[1];
-      console.log("accessToken: ", accessToken);
+
       const jobAlerts = await getJobAlerts(accessToken);
 
       res.status(200).send({
@@ -175,6 +176,10 @@ export async function getJobAlerts(accessToken) {
   try {
     const user = await requireUser(accessToken);
     const userID = user == null ? void 0 : user.id;
+    if (user?.role.isCandidate) {
+      const jobAlert = await JobAlertModel.find().lean(true);
+      return jobAlert;
+    }
     const jobAlerts = await getJobAlertsService({
       user: userID,
     });

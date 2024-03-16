@@ -1,11 +1,33 @@
 import { Company } from "../Models/CompanyModel.js";
 import { Job } from "../Models/JobModel.js";
 import ResumeModel from "../Models/ResumeModel.js";
-import { ObjectId } from "mongodb";
-import { findEmailByEmailType } from "./admin/emailService.js";
 import { sendNotificationEmail } from "../Middlewares/nodeMailer.js";
 import { emails } from "../utils/mongodb collections/emails.js";
+import Cloud from "../utils/cloudinary.js";
 
+// create a job service
+export async function createJobSeivice(input, headerImage) {
+  try {
+    let jobInput;
+    if (headerImage) {
+      // Upload image to cloudinary
+      const headerImageData = await Cloud.uploader.upload(headerImage);
+      jobInput = {
+        ...input,
+        avatar: headerImageData.secure_url,
+        avatarCloudinary_id: headerImageData.public_id,
+      };
+    } else {
+      jobInput = {
+        ...input,
+      };
+    }
+    const job = await Job.create(jobInput);
+    return job;
+  } catch (e) {
+    throw e;
+  }
+}
 // delete a job service
 export async function deleteJobService(jobID) {
   try {
@@ -14,7 +36,7 @@ export async function deleteJobService(jobID) {
     if (
       jobPreviousData == null ? void 0 : jobPreviousData.avatarCloudinary_id
     ) {
-      await cloudinary.uploader.destroy(jobPreviousData.avatarCloudinary_id);
+      await Cloud.uploader.destroy(jobPreviousData.avatarCloudinary_id);
     }
     const job = await Job.findByIdAndDelete(jobID);
     return job;
@@ -133,29 +155,11 @@ export async function jobstatusUpdate(query) {
           return "Job rejected by Admin";
         }
         case "featured": {
-          const user = await getUserWithPackage(userId);
-          const { featuredJobs } = user == null ? void 0 : user.package;
-          // find the user total job
-          const featuredJobsCount = await findTotalFeaturedJob(userId);
-          if (featuredJobsCount >= featuredJobs) {
-            throw new Error("You have reached your job limit");
-          }
           job.status.isFeatured = true;
           job.save();
           let featureJobResult = emails.filter(
             (item) => item.emailType === "JOB_FEATURED"
           );
-          // featureJobResult = await findEmailByEmailType("JOB_FEATURED");
-          if (featureJobResult.length === 0) {
-            const templateInput2 = {
-              senderAddress: "Meta Jobs",
-              subject: "Your Job is Featured",
-              message: "Congrats..!! Your Job is Featured",
-              emailType: "JOB_FEATURED",
-            };
-            // await createEmail(templateInput2);
-            // featureJobResult = await findEmailByEmailType("JOB_FEATURED");
-          }
           const feaureJobData = featureJobResult[0];
           const featurelInput = {
             userEmail: job.user.email,
@@ -172,17 +176,6 @@ export async function jobstatusUpdate(query) {
           let nonFeaturedEmails = emails.filter(
             (item) => item.emailType === "JOB_NON-FEATURED"
           );
-          // nonFeaturedEmails = await findEmailByEmailType("JOB_NON-FEATURED");
-          if (nonFeaturedEmails.length === 0) {
-            const templateInput3 = {
-              senderAddress: "Meta-Jobs",
-              subject: "Your Job is Non-Featured",
-              message: "Sorry..!! Your Job is Non-Featured",
-              emailType: "JOB_NON-FEATURED",
-            };
-            // await createEmail(templateInput3);
-            // nonFeaturedEmails = await findEmailByEmailType("JOB_NON-FEATURED");
-          }
           const nonFeaturedEmailData = nonFeaturedEmails[0];
           const nonFeaturedlInput = {
             userEmail: job.user.email,
@@ -196,21 +189,9 @@ export async function jobstatusUpdate(query) {
         case "expired": {
           job.status.isActive = false;
           job.save();
-          // const expiredJobResult = await findEmailByEmailType('JOB_EXPIRED')
           let expiredJobResult = emails.filter(
             (item) => item.emailType === "JOB_EXPIRED"
           );
-          // expiredJobResult = await findEmailByEmailType("JOB_EXPIRED");
-          if (expiredJobResult.length === 0) {
-            const templateInput4 = {
-              senderAddress: "Meta Jobs",
-              subject: "Your Job is Expired",
-              message: "Sorry..!! Your Job is Expired",
-              emailType: "JOB_EXPIRED",
-            };
-            // await createEmail(templateInput4);
-            // expiredJobResult = await findEmailByEmailType("JOB_EXPIRED");
-          }
           const expiredJobData = expiredJobResult[0];
           const expiredInput = {
             userEmail: job.user.email,
@@ -309,28 +290,11 @@ export async function jobstatusUpdate(query) {
     }
     switch (jobStatus) {
       case "featured":
-        const user1 = await getUserWithPackage(userId);
-        const { featuredJobs: featuredJobs1 } =
-          user1 == null ? void 0 : user1.package;
-        // find the user total job
-        const featuredJobsCount1 = await findTotalFeaturedJob(userId);
-        if (featuredJobsCount1 >= featuredJobs1) {
-          throw new Error("You have reached your job limit");
-        }
         job.status.isFeatured = true;
         job.save();
-        let featureJobResult1;
-        // featureJobResult1 = await findEmailByEmailType("JOB_FEATURED");
-        if (featureJobResult1.length === 0) {
-          const templateInput8 = {
-            senderAddress: "Meta Jobs",
-            subject: "Your Job is Featured",
-            message: "Congrats..!! Your Job is Featured",
-            emailType: "JOB_FEATURED",
-          };
-          // await createEmail(templateInput8);
-          // featureJobResult1 = await findEmailByEmailType("JOB_FEATURED");
-        }
+        let featureJobResult1 = emails.filter(
+          (item) => item.emailType === "JOB_FEATURED"
+        );
         const feaureJobData1 = featureJobResult1[0];
         const featurelInput1 = {
           userEmail: job.user.email,
@@ -344,18 +308,9 @@ export async function jobstatusUpdate(query) {
       case "nonFeatured":
         job.status.isFeatured = false;
         job.save();
-        let nonFeaturedEmails1;
-        // nonFeaturedEmails1 = await findEmailByEmailType("JOB_NON-FEATURED");
-        if (nonFeaturedEmails1.length === 0) {
-          const templateInput9 = {
-            senderAddress: "Meta-Jobs",
-            subject: "Your Job is Non-Featured",
-            message: "Sorry..!! Your Job is Non-Featured",
-            emailType: "JOB_NON-FEATURED",
-          };
-          // await createEmail(templateInput9);
-          // nonFeaturedEmails1 = await findEmailByEmailType("JOB_NON-FEATURED");
-        }
+        let nonFeaturedEmails1 = emails.filter(
+          (item) => item.emailType === "JOB_NON-FEATURED"
+        );
         const nonFeaturedEmailData1 = nonFeaturedEmails1[0];
         const nonFeaturedlInput1 = {
           userEmail: job.user.email,
@@ -368,18 +323,9 @@ export async function jobstatusUpdate(query) {
       case "draft":
         job.status.isPublished = false;
         job.save();
-        let draftJobResult1;
-        // draftJobResult1 = await findEmailByEmailType("JOB_DRAFTED");
-        if (draftJobResult1.length === 0) {
-          const templateInput10 = {
-            senderAddress: "Meta-Jobs",
-            subject: "Your Job is in Draft",
-            message: "Congrats..!! Your Job is in Draft",
-            emailType: "JOB_DRAFTED",
-          };
-          // await createEmail(templateInput10);
-          // draftJobResult1 = await findEmailByEmailType("JOB_DRAFTED");
-        }
+        let draftJobResult1 = emails.filter(
+          (item) => item.emailType === "JOB_DRAFTED"
+        );
         const draftJobData1 = draftJobResult1[0];
         const draftInput1 = {
           userEmail: job.user.email,
@@ -392,18 +338,9 @@ export async function jobstatusUpdate(query) {
       case "published":
         job.status.isPublished = true;
         job.save();
-        let publishedJobResult1;
-        // publishedJobResult1 = await findEmailByEmailType("JOB_PUBLISHED");
-        if (publishedJobResult1.length === 0) {
-          const templateInput11 = {
-            senderAddress: "Meta-Jobs",
-            subject: "Your Job is in Published",
-            message: "Congrats..!! Your Job is Published",
-            emailType: "JOB_PUBLISHED",
-          };
-          // await createEmail(templateInput11);
-          // publishedJobResult1 = await findEmailByEmailType("JOB_PUBLISHED");
-        }
+        let publishedJobResult1 = emails.filter(
+          (item) => item.emailType === "JOB_PUBLISHED"
+        );
         const publishedJobData1 = publishedJobResult1[0];
         const publishedInput1 = {
           userEmail: job.user.email,

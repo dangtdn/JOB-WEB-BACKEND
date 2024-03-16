@@ -1,5 +1,6 @@
 import express from "express";
 import jobController from "../Controllers/jobController.js";
+import upload from "../utils/multer.js";
 
 const {
   createJob,
@@ -17,7 +18,7 @@ const router = express.Router();
 //jobs routes
 
 // /api/job/create
-router.post("/admin/job/create", createJob);
+router.post("/admin/job/create", upload.single("headerImage"), createJob);
 // /api/job/id
 router.get("/jobs/:id", singleJob);
 // /api/job/update/job_id

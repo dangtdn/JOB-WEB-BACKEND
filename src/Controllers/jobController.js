@@ -7,44 +7,53 @@ import {
 } from "../services/admin/emailService.js";
 import { sendNotificationEmail } from "../Middlewares/nodeMailer.js";
 import {
+  createJobSeivice,
   deleteJobService,
   findAdminJob,
   findJob,
   getTotalCountService,
   jobstatusUpdate,
 } from "../services/jobService.js";
+import { emails } from "../utils/mongodb collections/emails.js";
 
 const JobController = {
   //create job
   createJob: async (req, res, next) => {
     try {
-      let jobInput;
-      // const { image } = req?.files;
-      // console.log("image: ", image);
-      // if (image) {
-      //   // const newImage = new Image({
-      //   //   ...image,
-      //   // });
-      //   jobInput = {
-      //     ...req.body.job,
-      //     avatarFile: image,
-      //   };
-      // }
+      const { headers } = req;
+      const accessToken = headers.authorization?.split(" ")[1];
+      const { file } = req;
+      const headerImage = file?.path;
 
-      if (req.body.headerImage) {
-        // Upload image to cloudinary
-        const headerImageData = await Cloud.uploader.upload(headerImage);
-        jobInput = {
-          ...req.body.job,
-          avatar: headerImageData.secure_url,
-          avatarCloudinary_id: headerImageData.public_id,
-        };
-      } else {
-        jobInput = {
-          ...req.body.job,
-        };
-      }
-      const job = await Job.create(jobInput);
+      const jobData = {
+        company: req.body.company,
+        jobTitle: req.body.jobTitle,
+        location: req.body.location,
+        region: req.body.region,
+        jobTypes: req.body.jobTypes.split(","),
+        category: req.body.category,
+        jobExperience: req.body.jobExperience,
+        specialTags: req.body.specialTags.split(","),
+        jobDescription: req.body.jobDescription,
+        email: req.body.email,
+        applyDeadline: req.body.applyDeadline,
+        hourlyrate: {
+          minimum: req.body.hourlyrateMinimum,
+          maximum: req.body.hourlyrateMaximum,
+        },
+        salary: {
+          minimum: req.body.salaryMinimum,
+          maximum: req.body.salaryMaximum,
+        },
+        applyLink: req.body.applyLink,
+      };
+
+      const reqQuery = {
+        accessToken,
+        jobData,
+        headerImage,
+      };
+      const job = await createJob(reqQuery);
       res.status(200).send({
         message: "Successfully created a job",
       });
@@ -205,7 +214,7 @@ const JobController = {
     try {
       const { headers } = req;
       const accessToken = headers.authorization?.split(" ")[1];
-      
+
       const jobs = await getJobsPrivate(accessToken);
       res.status(200).send({
         message: "Successfully fetched all private jobs",
@@ -271,6 +280,36 @@ const JobController = {
 
 export default JobController;
 
+// create job handller
+export async function createJob(reqQuery) {
+  try {
+    const { accessToken, jobData, headerImage } = reqQuery;
+    const userInfo = await requireUser(accessToken);
+    const userId = userInfo._id;
+    const userEmail = userInfo.email;
+
+    const jobInputData = {
+      ...jobData,
+      user: userId,
+      expireAt: new Date(new Date().setDate(new Date().getDate())),
+    };
+    const job = await createJobSeivice(jobInputData, headerImage);
+
+    let jobEmails = emails.filter((item) => item.emailType === "JOB_PUBLISHED");
+
+    const emailData = jobEmails[0];
+    const inputEmailData = {
+      userEmail,
+      emailData,
+      emailType: "JOB_PUBLISHED",
+      userId,
+    };
+    await sendNotificationEmail(inputEmailData);
+    return job;
+  } catch (e) {
+    throw e;
+  }
+}
 export async function deleteJob(reqQuery) {
   try {
     const user = await requireUser(reqQuery.accessToken);
@@ -280,28 +319,16 @@ export async function deleteJob(reqQuery) {
     if (!job) {
       throw new Error("Job Not Found");
     }
-    // const emailType = "JOB_DELETED";
-    // let emails;
-    // emails = await findEmailByEmailType(emailType);
-    // if (emails.length === 0) {
-    //   const templateInput = {
-    //     senderAddress: "Meta-Jobs",
-    //     subject: "Your Job is Deleted",
-    //     message: "You have deleted a job",
-    //     emailType: "JOB_DELETED",
-    //   };
-    //   await createEmail(templateInput);
-    //   emails = await findEmailByEmailType("JOB_DELETED");
-    // }
-    // const emailData = emails[0];
-    // const inputEmailData = {
-    //   userEmail: user.email,
-    //   emailData,
-    //   jobInfo: job,
-    //   userId: userID,
-    //   emailType,
-    // };
-    // sendNotificationEmail(inputEmailData);
+    let jobEmails = emails.filter((item) => item.emailType === "JOB_DELETED");
+    const emailData = jobEmails[0];
+    const inputEmailData = {
+      userEmail: user.email,
+      emailData,
+      jobInfo: job,
+      userId: userID,
+      emailType: "JOB_DELETED",
+    };
+    sendNotificationEmail(inputEmailData);
     return job;
   } catch (e) {
     throw e;

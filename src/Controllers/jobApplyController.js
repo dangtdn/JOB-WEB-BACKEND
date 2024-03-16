@@ -155,17 +155,6 @@ export async function createJobApply(reqQuery) {
     };
     const jobApply = await createJobApplyService(applyDataInput, cvFile);
     let applyEmails = emails.filter((item) => item.emailType === "JOB_APPLIED");
-    // emails = await findEmailByEmailType("JOB_APPLIED");
-    // if (emails.length === 0) {
-    // const templateInput = {
-    //   senderAddress: "Meta Jobs",
-    //   subject: "Job is Applied",
-    //   message: "Congrats..!! Your have applied a Job",
-    //   emailType: "JOB_APPLIED",
-    // };
-    // await createEmail(templateInput);
-    // emails = await findEmailByEmailType("JOB_APPLIED");
-    // }
     const emailData = applyEmails[0];
     const approvalInput = {
       userEmail: userEmail,
