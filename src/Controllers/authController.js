@@ -45,25 +45,6 @@ const authController = {
       });
     }
   },
-
-  // log out
-  logout(req, res, next) {
-    res.clearCookie("token");
-    res.status(200).json({
-      success: true,
-      message: "logged out",
-    });
-  },
-
-  // user profile
-  userProfile: async (req, res, next) => {
-    const user = await User.findById(req.user.id).select("-password");
-
-    res.status(200).json({
-      success: true,
-      user,
-    });
-  },
 };
 
 export default authController;

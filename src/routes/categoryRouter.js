@@ -2,16 +2,11 @@ import express from "express";
 import categoryController from "../Controllers/categoryController.js";
 import upload from "../utils/multer.js";
 
-const {
-  createCategory,
-  allCategories,
-  updateCategory,
-  deleteCategory,
-  getCategory,
-} = categoryController;
+const { createCategory, allCategories, deleteCategory, getCategory } =
+  categoryController;
 const router = express.Router();
 
-//job type routes
+//category type routes
 
 // /api/type/create
 router.post(

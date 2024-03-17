@@ -9,7 +9,6 @@ const {
   singleUser,
   updateUser,
   deleteUser,
-  createUserJobsHistory,
   getDashboardStat,
   updatePassword,
 } = userController;
@@ -24,11 +23,9 @@ router.get("/current-user", singleUser);
 router.get("/statistics", getDashboardStat);
 // /api/user/update/id
 router.put("/admin/user/update/:id", upload.single("profileImage"), updateUser);
-// /api/user/update/id
+// /api/users/password/reset
 router.put("/users/password/reset", updatePassword);
 // /api/admin/user/delete/id
 router.delete("/admin/user/delete/:id", deleteUser);
-// /api/user/jobhistory
-router.post("/user/job-histories", createUserJobsHistory);
 
 export default router;
