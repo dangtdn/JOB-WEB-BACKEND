@@ -6,6 +6,7 @@ import {
   createJobApplyService,
   findApplications,
   getJobApplicationsService,
+  updateApplyStatusService,
 } from "../services/jobApplyService.js";
 import { emails } from "../utils/mongodb collections/emails.js";
 
@@ -98,11 +99,26 @@ const JobApplyController = {
   // update status job apply
   updateApplyStatus: async (req, res, next) => {
     try {
-      const jobID = req.params.id;
+      const { id } = req.params;
+      const { headers } = req;
+      const accessToken = headers.authorization?.split(" ")[1];
+
       const applyData = {
         status: req.body.status,
       };
-      const application = await updateApplyStatusService(applyId, applyData);
+
+      const reqQuery = {
+        accessToken,
+        applyData,
+        applyId: id,
+      };
+      const application = await updateApplyStatus(reqQuery);
+
+      if (!application) {
+        return res.status(404).send({
+          message: "Application Not Found",
+        });
+      }
       res.status(201).json({
         message: "Application Updated",
         success: true,
@@ -178,6 +194,18 @@ export async function deleteUserApplication(reqQuery) {
     if (!application) {
       throw new Error("Application Not Found");
     }
+    return application;
+  } catch (e) {
+    throw e;
+  }
+}
+// update job application status handller
+export async function updateApplyStatus(reqQuery) {
+  try {
+    const { accessToken, applyData, applyId } = reqQuery;
+    const user = await requireUser(accessToken);
+    // update a job
+    const application = await updateApplyStatusService(applyId, applyData);
     return application;
   } catch (e) {
     throw e;

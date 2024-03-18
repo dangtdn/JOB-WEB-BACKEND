@@ -1,10 +1,6 @@
 import { Job } from "../Models/JobModel.js";
 import Cloud from "../utils/cloudinary.js";
 import { requireAdmin, requireUser } from "../Middlewares/auth.js";
-import {
-  createEmail,
-  findEmailByEmailType,
-} from "../services/admin/emailService.js";
 import { sendNotificationEmail } from "../Middlewares/nodeMailer.js";
 import {
   createJobSeivice,

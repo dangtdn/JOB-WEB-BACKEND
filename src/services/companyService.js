@@ -1,3 +1,4 @@
+import { sendNotificationEmail } from "../Middlewares/nodeMailer.js";
 import { Company } from "../Models/CompanyModel.js";
 import { Job } from "../Models/JobModel.js";
 import Cloud from "../utils/cloudinary.js";
@@ -283,7 +284,7 @@ export async function deleteCompanyService(companyID) {
       userEmail: companyData == null ? void 0 : companyData.user.email,
       emailData,
       userID: companyData == null ? void 0 : companyData.user._id,
-      emailType,
+      emailType: "COMPANY_DELETED",
     };
     sendNotificationEmail(inputEmailData);
     return company;

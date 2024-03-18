@@ -64,3 +64,14 @@ export async function createJobApplyService(input, cvFile) {
     throw e;
   }
 }
+// update job application status service
+export async function updateApplyStatusService(applyID, update) {
+  try {
+    const application = await JobApply.findByIdAndUpdate(applyID, update, {
+      new: true,
+    });
+    return application;
+  } catch (e) {
+    throw e;
+  }
+}
