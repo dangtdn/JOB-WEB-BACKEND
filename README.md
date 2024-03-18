@@ -110,7 +110,7 @@ pnpm start
 - [GET] - /users/:id/job-apply: Get detail application by userId from database
 - [GET] - /jobs/:id/job-apply : Get detail application by jobId from database
 - [POST] - /job-apply/create : Create new application
-- [PUT] - /job-apply/:id/update : Update application by id
+- [PUT] - /jobs/:id/job-apply/update : Update application by id
 - [DEL] - /users/:id/delete : Delete application by id
 
 ## Router for notifications

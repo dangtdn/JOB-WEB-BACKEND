@@ -21,7 +21,7 @@ router.get("/applications", getApplications);
 router.get("/users/:id/job-apply", getUserApplication);
 // /api/jobs/:id/job-apply
 router.get("/jobs/:id/job-apply", getJobApplication);
-// /api/job-apply/:id/update
+// /api/jobs/:id/job-apply/update
 router.put("/jobs/:id/job-apply/update", updateApplyStatus);
 // /api/job-apply/:id/update
 router.delete("/users/:id/delete", deleteUserApplication);
