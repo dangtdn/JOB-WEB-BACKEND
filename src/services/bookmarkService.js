@@ -1,4 +1,4 @@
-import BookmarkModel from "../Models/bookmarkModel.js";
+import BookmarkModel from "../Models/BookmarkModel.js";
 
 // find all bookmarks service
 export async function findBookmarks(query) {
