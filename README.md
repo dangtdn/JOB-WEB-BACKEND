@@ -12,7 +12,7 @@ RESTful API
 
 Deploy on [Vercel](https://vercel.com/)
 
-URL : https://point-of-sale-be.vercel.app/
+URL : https://job-web-be.vercel.app/
 
 ## Getting Started
 
