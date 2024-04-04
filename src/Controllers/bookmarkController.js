@@ -39,6 +39,12 @@ const bookmarkController = {
       const accessToken = headers.authorization?.split(" ")[1];
       const bookmarks = await getBookmarks(accessToken);
 
+      if (bookmarks.length == 0) {
+        return res.status(200).send({
+          message: "No Bookmark Found",
+          data: [],
+        });
+      }
       if (bookmarks[0].bookmarks.length == 0) {
         return res.status(200).send({
           message: "No Bookmark Found",
